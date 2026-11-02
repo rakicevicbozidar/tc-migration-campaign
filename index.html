@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TeamCity — Have you ever wanted CI, that…</title>
+  <meta name="description" content="Migrate from GitHub Actions to TeamCity — CI/CD by JetBrains.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Fallbacks until JetBrains Sans files are added (see styles.css @font-face) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="is-loading">
+
+  <!-- Ambient background layers (shared by the intro and the landing state) -->
+  <div class="stage" aria-hidden="true">
+    <div class="hero-bg"><img src="assets/hero-bg.svg" alt=""></div>
+    <div class="horizon"><img src="assets/horizon-glow.svg" alt="" width="2392.87" height="323"></div>
+  </div>
+
+  <!-- Intro / loading screen -->
+  <div class="intro" aria-hidden="true">
+    <div class="intro-brand">
+      <div class="intro-tag">
+        <span class="intro-tag-text">CI/CD by</span>
+        <img src="assets/jetbrains-wordmark-intro.svg" alt="" width="109.559" height="23.5294">
+      </div>
+      <img class="intro-logo" src="assets/teamcity-logo-intro.svg" alt="" width="400" height="93.7729">
+    </div>
+    <button class="intro-skip" type="button" tabindex="-1">Skip intro</button>
+  </div>
+
+  <header class="nav">
+    <a class="nav-logo" href="https://www.jetbrains.com/teamcity/" aria-label="TeamCity">
+      <img src="assets/teamcity-logo-nav.svg" alt="TeamCity" width="153.562" height="36">
+    </a>
+    <a class="btn reveal" style="--d: 250ms; --y: -40px" href="https://www.jetbrains.com/teamcity/download/">
+      <span>Try TeamCity</span>
+    </a>
+  </header>
+
+  <main class="hero">
+    <p class="eyebrow">
+      <span>CI/CD by</span>
+      <img src="assets/jetbrains-wordmark.svg" alt="JetBrains" width="93.125" height="20">
+    </p>
+
+    <h1 class="hero-title" aria-label="Have you ever wanted CI, that…">
+      <span class="w">Have</span> <span class="w">you</span> <span class="w">ever</span>
+      <span class="w">wanted</span> <span class="w">CI,</span>
+      <span class="w">that...</span>
+    </h1>
+
+    <div class="hero-video reveal" style="--d: 500ms; --y: 0px">
+      <!-- Drop the exported Figma video at assets/magic-pipeline-demo.mp4; the coded terminal below is shown until it loads. -->
+      <video class="video-media" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+        <source src="assets/magic-pipeline-demo.mp4" type="video/mp4">
+      </video>
+      <div class="term-standin" aria-hidden="true">
+        <div class="term-streak"></div>
+        <div class="term">
+          <div class="term-bar">
+            <i></i><i></i><i></i>
+            <span class="term-title">claude — product designer</span>
+            <span class="term-status">connected</span>
+          </div>
+          <div class="term-body">
+            <div class="term-line term-muted">/design-pipeline</div>
+            <div class="term-output"></div>
+            <div class="term-line term-prompt"><span class="term-caret">›</span><span class="term-input"></span><span class="term-cursor"></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="video-neutralize"></div>
+      <div class="video-tint"></div>
+    </div>
+
+    <section class="cards" aria-label="What TeamCity offers">
+      <article class="card reveal" style="--d: 700ms">
+        <img class="card-glow" src="assets/card-stack-header.svg" alt="" width="964.251" height="135.277">
+        <h2>...works with any VCS you already have</h2>
+        <div class="card-art vcs" role="img" aria-label="GitHub, GitLab and Bitbucket">
+          <span class="vcs-logo vcs-github" style="--i: 0"><img src="assets/vcs/github.svg" alt="" width="80" height="80"></span>
+          <span class="vcs-logo vcs-gitlab" style="--i: 1">
+            <img class="gl-g44" src="assets/vcs/gitlab-g44.svg" alt="">
+            <img class="gl-g48" src="assets/vcs/gitlab-g48.svg" alt="">
+            <img class="gl-g56" src="assets/vcs/gitlab-g56.svg" alt="">
+            <img class="gl-g64" src="assets/vcs/gitlab-g64.svg" alt="">
+            <img class="gl-g72" src="assets/vcs/gitlab-g72.svg" alt="">
+            <img class="gl-g76" src="assets/vcs/gitlab-g76.svg" alt="">
+            <img class="gl-g80" src="assets/vcs/gitlab-g80.svg" alt="">
+            <img class="gl-g84" src="assets/vcs/gitlab-g84.svg" alt="">
+          </span>
+          <span class="vcs-logo vcs-bitbucket" style="--i: 2"><img src="assets/vcs/bitbucket.svg" alt="" width="63.9994" height="55.9998"></span>
+        </div>
+      </article>
+      <article class="card reveal" style="--d: 820ms">
+        <img class="card-glow" src="assets/card-stack-header.svg" alt="" width="964.251" height="135.277">
+        <h2>...or even when VCS is down</h2>
+        <div class="card-art pipeline" aria-hidden="true">
+          <span class="pl-connector"><span><img src="assets/pipeline/connector-h.svg" alt=""></span></span>
+          <img class="pl-dependency" src="assets/pipeline/dependency-line.svg" alt="" width="28.8152" height="90.0474">
+          <div class="job job-done">
+            <div class="job-status"><img src="assets/pipeline/icon-success.svg" alt="" width="14.4076" height="14.4076"><span>2m 22s</span></div>
+            <div class="job-name">Publish artifacts</div>
+            <div class="job-sub">Success</div>
+          </div>
+          <div class="pl-column">
+            <div class="job job-running" data-seconds="26">
+              <span class="job-load"></span>
+              <div class="job-status"><img class="spin" src="assets/pipeline/icon-running.svg" alt="" width="14.4076" height="14.4076"><span class="job-time">26s left</span></div>
+              <div class="job-name">Jobs name</div>
+              <div class="job-sub">Step 1/2</div>
+            </div>
+            <div class="job job-running" data-seconds="22">
+              <span class="job-load"></span>
+              <div class="job-status"><img class="spin" src="assets/pipeline/icon-running.svg" alt="" width="14.4076" height="14.4076"><span class="job-time">22s left</span></div>
+              <div class="job-name">Jobs name</div>
+              <div class="job-sub">Step 1/2</div>
+            </div>
+          </div>
+        </div>
+      </article>
+      <article class="card reveal" style="--d: 940ms">
+        <img class="card-glow" src="assets/card-stack-header.svg" alt="" width="964.251" height="135.277">
+        <h2>...works well with your AI agents</h2>
+        <div class="card-art agents" role="img" aria-label="TeamCity connected to OpenAI, Copilot, Claude, Cursor and Junie">
+          <span class="ag-line ag-line-1"><span><img src="assets/agents/line-1.svg" alt=""></span></span>
+          <span class="ag-line ag-line-2"><span><img src="assets/agents/line-2.svg" alt=""></span></span>
+          <span class="ag-line ag-line-3"><span><img src="assets/agents/line-3.svg" alt=""></span></span>
+          <span class="ag-line ag-line-4"><span><img src="assets/agents/line-4.svg" alt=""></span></span>
+          <span class="ag-line ag-line-5"><span><img src="assets/agents/line-5.svg" alt=""></span></span>
+          <span class="chip chip-openai" style="--i: 0"><i></i><img src="assets/agents/openai.svg" alt="" width="24.1045" height="23.8893"></span>
+          <span class="chip chip-cursor chip-dim" style="--i: 3"><i></i><img src="assets/agents/cursor.svg" alt="" width="24.1045" height="27.4797"></span>
+          <span class="chip chip-copilot chip-dim" style="--i: 1"><i></i><img src="assets/agents/copilot.svg" alt="" width="24.1045" height="20.2167"></span>
+          <span class="chip chip-claude" style="--i: 2"><i></i><img src="assets/agents/claude.svg" alt="" width="24.1045" height="24.1045"></span>
+          <span class="chip chip-junie" style="--i: 4"><i></i><img src="assets/agents/junie.svg" alt="" width="24.1045" height="25.5224"></span>
+          <img class="ag-teamcity" src="assets/agents/teamcity-mark.svg" alt="" width="54.3791" height="54.3791">
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="main.js"></script>
+</body>
+</html>
