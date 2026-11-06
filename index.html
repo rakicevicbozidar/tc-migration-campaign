@@ -3,20 +3,69 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TeamCity — Have you ever wanted CI, that…</title>
-  <meta name="description" content="Migrate from GitHub Actions to TeamCity — CI/CD by JetBrains.">
+  <title>TeamCity — A reliable GitHub Actions alternative</title>
+  <meta name="description" content="Bring your GitHub Actions project. Let your AI agent help set up and run your first TeamCity build.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Fallbacks until JetBrains Sans files are added (see styles.css @font-face) -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <!--
+    Runs before first paint, so nothing flickers.
+
+    A/B test "hero_layout" (Figma: "Landing page | Plan A" / "Plan B"):
+      A = split hero, text left and the demo video right
+      B = centred hero, the demo video full width below
+    Force a variant with ?variant=a or ?variant=b (it sticks for that browser).
+    The assignment and every CTA click are pushed to window.dataLayer for GTM / analytics.
+
+    Intro: the loading screen plays once per browser session; reloads go straight to the page.
+  -->
+  <script>
+    (function () {
+      var root = document.documentElement;
+      root.classList.add("js");
+
+      var KEY = "tc-ab-hero_layout-v2", OK = { a: 1, b: 1 }, v;
+      var forced = new URLSearchParams(location.search).get("variant");
+      try { v = localStorage.getItem(KEY); } catch (e) {}
+      if (forced && OK[forced.toLowerCase()]) v = forced.toLowerCase();
+      if (!OK[v]) v = Math.random() < 0.5 ? "a" : "b";
+      try { localStorage.setItem(KEY, v); } catch (e) {}
+      root.setAttribute("data-variant", v);
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: "ab_assignment", experiment: "hero_layout", variant: v });
+
+      var seen = false;
+      try { seen = sessionStorage.getItem("tc-intro-seen") === "1"; } catch (e) {}
+      var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (seen || reduce || /[?&]intro=0/.test(location.search)) {
+        root.classList.add("no-intro");
+      } else {
+        try { sessionStorage.setItem("tc-intro-seen", "1"); } catch (e) {}
+        // the intro always starts at the top of the page
+        if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+      }
+    })();
+  </script>
 </head>
 <body class="is-loading">
 
-  <!-- Ambient background layers (shared by the intro and the landing state) -->
+  <!-- Loading-screen horizon (fixed to the viewport) -->
   <div class="stage" aria-hidden="true">
-    <div class="hero-bg"><img src="assets/hero-bg.svg" alt=""></div>
     <div class="horizon"><img src="assets/horizon-glow.svg" alt="" width="2392.87" height="323"></div>
+  </div>
+
+  <!-- Page-long ambient glows, positioned like the Figma frame -->
+  <div class="backdrop" aria-hidden="true">
+    <div class="hero-bg"><img src="assets/landing/hero-bg-top.svg" alt=""></div>
+    <div class="glow glow-ill"><img src="assets/landing/illustration-group.svg" alt="" width="2392.87" height="323"></div>
+    <div class="glow glow-side glow-left"><span><img src="assets/landing/hero-bg-left.svg" alt=""></span></div>
+    <div class="glow glow-side glow-right"><span><img src="assets/landing/hero-bg-right.svg" alt=""></span></div>
+    <div class="glow glow-blur"><img src="assets/landing/layer-blur.svg" alt=""></div>
+    <div class="glow glow-band glow-band-1"><span><img src="assets/landing/band-glow.svg" alt=""></span></div>
+    <div class="glow glow-band glow-band-2"><span><img src="assets/landing/band-glow.svg" alt=""></span></div>
+    <div class="glow glow-bottom"><img src="assets/horizon-glow.svg" alt="" width="2392.87" height="323"></div>
   </div>
 
   <!-- Intro / loading screen -->
@@ -31,114 +80,418 @@
     <button class="intro-skip" type="button" tabindex="-1">Skip intro</button>
   </div>
 
-  <header class="nav">
+  <header class="site-header">
+   <div class="nav">
     <a class="nav-logo" href="https://www.jetbrains.com/teamcity/" aria-label="TeamCity">
-      <img src="assets/teamcity-logo-nav.svg" alt="TeamCity" width="153.562" height="36">
+      <img src="assets/landing/teamcity-logo-nav.svg" alt="TeamCity" width="153.562" height="36">
     </a>
-    <a class="btn reveal" style="--d: 250ms; --y: -40px" href="https://www.jetbrains.com/teamcity/download/">
-      <span>Try TeamCity</span>
-    </a>
+    <nav class="nav-links reveal" style="--d: 250ms; --y: -40px" aria-label="Main">
+      <a class="btn btn-ghost" href="#why">Why TeamCity</a>
+      <a class="btn btn-ghost" href="#features">Features</a>
+      <a class="btn btn-ghost" href="#get-started">Get started</a>
+      <a class="btn btn-outline" href="https://www.jetbrains.com/teamcity/cloud/">Try free</a>
+    </nav>
+   </div>
   </header>
 
-  <main class="hero">
-    <p class="eyebrow">
-      <span>CI/CD by</span>
-      <img src="assets/jetbrains-wordmark.svg" alt="JetBrains" width="93.125" height="20">
-    </p>
+  <main>
+    <!-- Hero -->
+    <section class="hero wrap">
+      <p class="eyebrow">
+        <span>CI/CD by</span>
+        <img src="assets/landing/jetbrains-eyebrow.svg" alt="JetBrains" width="93.125" height="20">
+      </p>
 
-    <h1 class="hero-title" aria-label="Have you ever wanted CI, that…">
-      <span class="w">Have</span> <span class="w">you</span> <span class="w">ever</span>
-      <span class="w">wanted</span> <span class="w">CI,</span>
-      <span class="w">that...</span>
-    </h1>
+      <h1 class="hero-title" aria-label="Looking for a reliable GitHub Actions alternative?">
+        <span class="w">Looking</span> <span class="w">for</span> <span class="w">a</span> <span class="w">reliable</span>
+        <span class="w">GitHub</span> <span class="w">Actions</span> <span class="w">alternative?</span>
+      </h1>
 
-    <div class="hero-video reveal" style="--d: 500ms; --y: 0px">
-      <!-- Drop the exported Figma video at assets/magic-pipeline-demo.mp4; the coded terminal below is shown until it loads. -->
-      <video class="video-media" autoplay muted loop playsinline preload="auto" aria-hidden="true">
-        <source src="assets/magic-pipeline-demo.mp4" type="video/mp4">
-      </video>
-      <div class="term-standin" aria-hidden="true">
-        <div class="term-streak"></div>
-        <div class="term">
-          <div class="term-bar">
-            <i></i><i></i><i></i>
-            <span class="term-title">claude — product designer</span>
-            <span class="term-status">connected</span>
+      <p class="hero-sub reveal" style="--d: 700ms; --y: 40px">Bring your GitHub Actions project. Let your AI agent help set up and run your first TeamCity build</p>
+
+      <div class="hero-action reveal" style="--d: 820ms; --y: 40px">
+        <div class="actions">
+          <a class="btn btn-lg btn-outline" href="https://www.jetbrains.com/teamcity/contact-us/">Schedule a demo</a>
+          <a class="btn btn-lg" href="https://www.jetbrains.com/teamcity/cloud/">Start a free trial</a>
+        </div>
+        <p class="hero-note">Free TeamCity Cloud access. AI-assisted setup.</p>
+      </div>
+
+      <div class="hero-video reveal" style="--d: 1000ms; --y: 80px">
+        <video class="video-media" autoplay muted loop playsinline preload="auto" aria-label="Onboarding a GitHub Actions project to TeamCity with one command">
+          <source src="assets/github-actions-to-teamcity.mp4?v=2" type="video/mp4">
+        </video>
+      </div>
+    </section>
+
+    <!-- Keep your project -->
+    <section class="section why wrap" id="why">
+      <h2 class="h1 sr">Keep your project. Change how you work with CI.</h2>
+      <p class="lead sr">Choose where your code lives, check changes before committing, and bring your coding agent into the build process</p>
+
+      <div class="cards">
+        <article class="card sr" style="--d: 0ms">
+          <img class="card-glow" src="assets/landing/card-stack-header.svg" alt="" width="964.251" height="135.277">
+          <h3>Change your CI.<br>Keep your Git host.</h3>
+          <p>Use TeamCity with GitHub or another VCS provider. Your repository location doesn’t have to decide your CI.</p>
+        </article>
+        <article class="card sr" style="--d: 120ms">
+          <img class="card-glow" src="assets/landing/card-stack-header.svg" alt="" width="964.251" height="135.277">
+          <h3>Test a fix before you commit it.</h3>
+          <p>Build and test local changes with Remote Run. Check the results before creating another troubleshooting commit.</p>
+        </article>
+        <article class="card sr" style="--d: 240ms">
+          <img class="card-glow" src="assets/landing/card-stack-header.svg" alt="" width="964.251" height="135.277">
+          <h3>Let your agent<br>work with CI directly</h3>
+          <p>Configure pipelines, run builds, and investigate failures through the TeamCity CLI and MCP.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Trusted by -->
+    <section class="trusted sr" aria-label="Customers">
+      <h2>Trusted by 30K+ DevOps teams at leading companies</h2>
+      <div class="logo-grid">
+        <ul class="logos">
+          <li class="logo"><img src="assets/logos/logo-1.svg" alt="Sorbonne Université" width="103.526" height="41.6885"></li>
+          <li class="logo"><img src="assets/logos/logo-2.svg" alt="Sorbonne Université" width="99.3329" height="40"></li>
+          <li class="logo">
+            <span class="logo-art" style="width: 131px" role="img" aria-label="Perforce">
+              <span class="logo-mask" style="inset: 19.65% 0.52% 20.55% 0.2%; --mask: url('assets/logos/perforce-mask.svg'); --ms: 130.277px 24.032px"><img src="assets/logos/perforce.svg" alt=""></span>
+            </span>
+          </li>
+          <li class="logo"><img src="assets/logos/logo-4.svg" alt="Sorbonne Université" width="103.526" height="40"></li>
+          <li class="logo">
+            <span class="logo-art" style="width: 37.5px" role="img" aria-label="HP">
+              <span class="logo-mask" style="inset: 2.05% 0 2.93% 0.03%; --mask: url('assets/logos/hp-mask.svg'); --ms: 37.5px 38px; --mp: -0.01px 0.007px"><img src="assets/logos/hp.svg" alt=""></span>
+            </span>
+          </li>
+          <li class="logo">
+            <span class="logo-art" style="width: 117px" role="img" aria-label="NVIDIA">
+              <span class="logo-mask" style="inset: 20.03% 0.35% 20.42% -0.57%; --mask: url('assets/logos/nvidia-mask.svg'); --ms: 117.25px 23.45px; --mp: 0 0.139px"><img src="assets/logos/nvidia.svg" alt=""></span>
+            </span>
+          </li>
+          <li class="logo"><img src="assets/logos/amazon-game-studios.svg" alt="Amazon Games" width="54" height="40"></li>
+          <li class="logo"><img src="assets/logos/logo-8.svg" alt="Sorbonne Université" width="99.3329" height="40"></li>
+          <li class="logo">
+            <span class="logo-art" style="width: 88px" role="img" aria-label="Visa">
+              <span class="logo-mask no-mask" style="inset: 14.5% 0.64% 15.49% 0.64%"><img src="assets/logos/visa.svg" alt=""></span>
+            </span>
+          </li>
+          <li class="logo">
+            <span class="logo-art" style="width: 91px" role="img" aria-label="GoPro">
+              <span class="logo-mask no-mask" style="inset: 10.6% 0.19% 11.23% -0.39%"><img src="assets/logos/gopro.svg" alt=""></span>
+            </span>
+          </li>
+          <li class="logo">
+            <span class="logo-art" style="width: 120px" role="img" aria-label="McAfee">
+              <span class="logo-mask" style="inset: 20.82% 0.3% 20.55% -0.22%; --mask: url('assets/logos/logo-11-mask.svg'); --ms: 119.895px 23.45px"><img src="assets/logos/logo-11.svg" alt=""></span>
+            </span>
+          </li>
+          <li class="logo">
+            <span class="logo-art" style="width: 119.894px; height: 23.451px" role="img" aria-label="McAfee">
+              <span class="logo-mask" style="inset: 0; --mask: url('assets/logos/logo-11-mask.svg'); --ms: 119.895px 23.45px"><img src="assets/logos/logo-12.svg" alt=""></span>
+            </span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- What sets TeamCity apart -->
+    <section class="section features wrap" id="features">
+      <h2 class="h1 sr">What sets TeamCity apart</h2>
+
+      <div class="features-grid">
+        <div class="accordion sr" data-accordion="single">
+          <div class="acc-item is-open" data-view="pipeline">
+            <h3>
+              <button class="acc-trigger" type="button" aria-expanded="true" aria-controls="feat-1" id="feat-1-btn">
+                <span>Configure pipelines with TeamCity</span><i class="pm" aria-hidden="true"></i>
+              </button>
+            </h3>
+            <div class="acc-panel" id="feat-1" role="region" aria-labelledby="feat-1-btn">
+              <div class="acc-inner">
+                <p>Build your CI/CD pipeline with TeamCity. Add jobs and steps in the visual editor, or work directly with YAML when you want to edit the configuration as code</p>
+                <a class="link" href="https://blog.jetbrains.com/teamcity/2026/05/teamcity-20261/" target="_blank" rel="noopener">Learn more<span class="link-arrow" aria-hidden="true">↗</span></a>
+              </div>
+            </div>
           </div>
-          <div class="term-body">
-            <div class="term-line term-muted">/design-pipeline</div>
-            <div class="term-output"></div>
-            <div class="term-line term-prompt"><span class="term-caret">›</span><span class="term-input"></span><span class="term-cursor"></span></div>
+          <div class="acc-item" data-view="cli">
+            <h3>
+              <button class="acc-trigger" type="button" aria-expanded="false" aria-controls="feat-2" id="feat-2-btn">
+                <span>Work from your terminal with CLI</span><i class="pm" aria-hidden="true"></i>
+              </button>
+            </h3>
+            <div class="acc-panel" id="feat-2" role="region" aria-labelledby="feat-2-btn" hidden>
+              <div class="acc-inner">
+                <p>Start builds, follow their progress, and inspect logs and test results with the TeamCity CLI. Use the same tools yourself or through your coding agent.</p>
+                <a class="link" href="https://www.jetbrains.com/help/teamcity/teamcity-cli.html" target="_blank" rel="noopener">Learn more<span class="link-arrow" aria-hidden="true">↗</span></a>
+              </div>
+            </div>
+          </div>
+          <div class="acc-item" data-view="code">
+            <h3>
+              <button class="acc-trigger" type="button" aria-expanded="false" aria-controls="feat-3" id="feat-3-btn">
+                <span>Manage configuration as code</span><i class="pm" aria-hidden="true"></i>
+              </button>
+            </h3>
+            <div class="acc-panel" id="feat-3" role="region" aria-labelledby="feat-3-btn" hidden>
+              <div class="acc-inner">
+                <p>Use YAML or Kotlin DSL to manage TeamCity configuration in code and reuse common patterns across projects. Review changes alongside the rest of your code.</p>
+                <a class="link" href="https://www.jetbrains.com/help/teamcity/kotlin-dsl.html" target="_blank" rel="noopener">Learn more<span class="link-arrow" aria-hidden="true">↗</span></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TeamCity pipeline editor mock (708×472 in the design, scaled to fit) -->
+        <div class="tc-shot sr" style="--d: 150ms" data-view="pipeline" role="img" aria-label="TeamCity pipeline editor with Build, Test and Security scan jobs">
+          <div class="tc-ui" aria-hidden="true">
+            <img class="tc-canvas" src="assets/ui/canvas-bg.png" alt="">
+
+            <div class="tc-layer tc-layer-pipeline">
+            <div class="tc-pipeline">
+              <div class="tc-pipe-head">
+                <span class="tc-pipe-title"><img src="assets/ui/icon-success-head.svg" alt="" class="tc-ic tc-ic-ok">Authentication service</span>
+                <img src="assets/ui/icon-edit-head.svg" alt="" class="tc-ic">
+              </div>
+            </div>
+            <div class="tc-jobs">
+              <div class="tc-job tc-job-ok">
+                <img src="assets/ui/icon-success.svg" alt="" class="tc-ic">
+                <span class="tc-job-name">Build</span>
+                <span class="tc-job-sub">Success</span>
+              </div>
+              <div class="tc-deps">
+                <img src="assets/ui/dependency-line-1.svg" alt="" class="tc-dep-1">
+                <span class="tc-dep-2"><img src="assets/ui/dependency-line-2.svg" alt=""></span>
+              </div>
+              <div class="tc-col">
+                <div class="tc-job tc-job-err">
+                  <span class="tc-load"></span>
+                  <img src="assets/ui/icon-error.svg" alt="" class="tc-ic">
+                  <span class="tc-job-name">Test</span>
+                  <span class="tc-job-sub">Step 1/2</span>
+                </div>
+                <div class="tc-job tc-job-run">
+                  <span class="tc-load"></span>
+                  <img src="assets/ui/icon-running.svg" alt="" class="tc-ic">
+                  <span class="tc-job-name">Security scan</span>
+                  <span class="tc-job-sub">Step 1/2</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="tc-crumbs">
+              <span class="tc-crumb"><img src="assets/ui/crumb-project.svg" alt="" class="tc-ic"><span>Authentication service</span><img src="assets/ui/crumb-chevron.svg" alt="" class="tc-ic tc-chev"></span>
+              <span class="tc-slash">/</span>
+              <span class="tc-crumb"><img src="assets/ui/crumb-run.svg" alt="" class="tc-ic"><span>Run #25 at 23 Jan 16:23</span></span>
+              <span class="tc-branch"><img src="assets/ui/branches.svg" alt="" class="tc-ic">main (Default)</span>
+            </div>
+
+            <div class="tc-switch">
+              <span class="is-on">Visual</span>
+              <span>YAML</span>
+            </div>
+            </div>
+
+            <div class="tc-layer tc-layer-code">
+              <div class="tc-editor">
+                <div class="tc-tabs">
+                  <button type="button" data-tab="visual" tabindex="-1">Visual</button>
+                  <button type="button" data-tab="yaml" tabindex="-1" class="is-on">YAML</button>
+                  <button type="button" data-tab="kotlin" tabindex="-1">Kotlin DSL</button>
+                </div>
+                <div class="tc-code tc-code-yaml" data-code="yaml">
+                  <div class="tc-row"><span class="tc-ln">1</span><i></i><span class="tc-tx"><span class="ck">jobs:</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">2</span><i></i><i></i><span class="tc-tx"><span class="ck">Build:</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">3</span><i></i><i></i><i></i><span class="tc-tx"><span class="ck">name:</span><span class="cv">Build</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">4</span><i></i><i></i><i></i><span class="tc-tx"><span class="ck">steps:</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">5</span><i></i><i></i><i></i><i></i><span class="tc-tx"><span class="ck">type:</span><span class="cv">script</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">6</span><i></i><i></i><i></i><i></i><span class="tc-tx"><span class="ck">name:</span><span class="cv">Build backend</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">7</span><i></i><i></i><i></i><i></i><span class="tc-tx"><span class="ck">script-content:</span><span class="cv">|-</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">8</span><i></i><i></i><i></i><i></i><i></i><span class="tc-tx"><span class="cv">echo "Compiling backend services..."</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">9</span><i></i><i></i><i></i><i></i><i></i><span class="tc-tx"><span class="cv">sleep 2</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">10</span><i></i><i></i><i></i><i></i><i></i><span class="tc-tx"><span class="cv">echo "Backend build completed"</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">11</span><i></i><i></i><i></i><i></i><i></i><span class="tc-tx"></span></div>
+                  <div class="tc-row"><span class="tc-ln">12</span><i></i><i></i><i></i><i></i><span class="tc-tx"><span class="ck">type:</span><span class="cv">script</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">13</span><i></i><i></i><i></i><i></i><span class="tc-tx"><span class="ck">name:</span><span class="cv">Build backend</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">14</span><i></i><i></i><i></i><i></i><span class="tc-tx"><span class="ck">script-content:</span><span class="cv">|-</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">15</span><i></i><i></i><i></i><i></i><i></i><span class="tc-tx"><span class="cv">echo "Compiling backend services..."</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">16</span><i></i><i></i><i></i><i></i><i></i><span class="tc-tx"><span class="cv">sleep 2</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">17</span><i></i><i></i><i></i><i></i><i></i><span class="tc-tx"><span class="cv">echo "Backend build completed"</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">18</span><i></i><i></i><i></i><i></i><i></i><span class="tc-tx"></span></div>
+                  <div class="tc-row"><span class="tc-ln">19</span><i></i><i></i><i></i><i></i><span class="tc-tx"><span class="ck">type:</span><span class="cv">script</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">20</span><i></i><i></i><i></i><i></i><span class="tc-tx"><span class="ck">name:</span><span class="cv">Move artifacts</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">21</span><i></i><i></i><i></i><i></i><span class="tc-tx"><span class="ck">script-content:</span><span class="cv">|-</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">22</span><i></i><i></i><i></i><i></i><i></i><span class="tc-tx"><span class="cv">echo "Compiling backend services..."</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">23</span><i></i><i></i><i></i><i></i><i></i><span class="tc-tx"><span class="cv">mkdir -p build</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">24</span><i></i><i></i><i></i><i></i><i></i><span class="tc-tx"><span class="cv">echo "Demo artifact" &gt; build/authentication-service.txt</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">25</span><i></i><i></i><i></i><i></i><i></i><span class="tc-tx"><span class="cv">sleep 1</span></span></div>
+                  <div class="tc-row"><span class="tc-ln">26</span><i></i><i></i><i></i><i></i><i></i><span class="tc-tx"><span class="cv">echo "Artifacts prepared"</span></span></div>
+                </div>
+                <div class="tc-code tc-code-kotlin" data-code="kotlin" hidden>
+                  <div class="tc-row"><span class="tc-tx"><span class="ck">import</span><span class="cv">jetbrains.buildServer.configs.kotlin.project</span></span></div>
+                  <div class="tc-row"><span class="tc-tx"><span class="ck">import</span><span class="cv">jetbrains.buildServer.configs.kotlin.version</span></span></div>
+                  <div class="tc-row"><span class="tc-tx"><span class="ck">import</span><span class="cv">jetbrains.buildServer.configs.kotlin.pipelines.Pipeline</span></span></div>
+                  <div class="tc-row"><span class="tc-tx"><span class="ck">import</span><span class="cv">jetbrains.buildServer.configs.kotlin.buildSteps.script</span></span></div>
+                  <div class="tc-row"><span class="tc-tx"></span></div>
+                  <div class="tc-row"><span class="tc-tx"><span class="ck">import</span><span class="cv">jetbrains.buildServer.configs.kotlin.buildSteps.script</span></span></div>
+                  <div class="tc-row"><span class="tc-tx"></span></div>
+                  <div class="tc-row"><span class="tc-tx"><span class="ck">project {</span></span></div>
+                  <div class="tc-row i1"><span class="tc-tx"><span class="cv">pipeline(AuthenticationServicePipeline)</span></span></div>
+                  <div class="tc-row"><span class="tc-tx"><span class="ck">}</span></span></div>
+                  <div class="tc-row"><span class="tc-tx"></span></div>
+                  <div class="tc-row"><span class="tc-tx"><span class="ck">object</span><span class="cv">AuthenticationServicePipeline : Pipeline({</span></span></div>
+                  <div class="tc-row"><span class="tc-tx"><span class="ck">    id</span><span class="cv">("AuthenticationService")</span></span></div>
+                  <div class="tc-row"><span class="tc-tx"><span class="ck">    name =</span><span class="cv">("AuthenticationService")</span></span></div>
+                  <div class="tc-row"><span class="tc-tx"></span></div>
+                  <div class="tc-row"><span class="tc-tx"><span class="ck">        steps {</span></span></div>
+                  <div class="tc-row"><span class="tc-tx"><span class="ck">            script {</span></span></div>
+                  <div class="tc-row i2"><span class="tc-tx"><span class="ck">    name =</span><span class="cv">"Build backend"</span></span></div>
+                  <div class="tc-row i2"><span class="tc-tx"><span class="ck">    scriptContent = </span><span class="cv">"""</span></span></div>
+                  <div class="tc-row i2"><span class="tc-tx"><span class="ck">         echo "Compiling backend services..."</span></span></div>
+                  <div class="tc-row i2"><span class="tc-tx"><span class="ck">         sleep 2</span></span></div>
+                  <div class="tc-row i2"><span class="tc-tx"><span class="ck">         echo "Backend build completed"</span></span></div>
+                  <div class="tc-row i3"><span class="tc-tx"><span class="ck">"""</span><span class="cv">.trimIndent()</span></span></div>
+                </div>
+              </div>
+              <div class="tc-crumbs tc-crumbs-code">
+                <span class="tc-crumb"><img src="assets/ui/crumb-edit.svg" alt="" class="tc-ic"><span>Authentication service</span><img src="assets/ui/crumb-chevron.svg" alt="" class="tc-ic tc-chev"></span>
+                <span class="tc-branch">tc/branch-node</span>
+              </div>
+            </div>
+
+            <div class="tc-layer tc-layer-cli">
+              <div class="term">
+                <div class="term-bar">
+                  <img class="term-dots" src="assets/cli/window-dots.svg" alt="">
+                  <span class="term-title"><img src="assets/cli/terminal-icon.svg" alt="">your.terminal</span>
+                </div>
+                <div class="term-body">
+                  <div class="term-line"><span>your.terminal ~ % </span><span class="term-type" data-type="550,60.94"><span>t</span><span>e</span><span>a</span><span>m</span><span>c</span><span>i</span><span>t</span><span>y</span><span> </span><span>o</span><span>n</span><span>b</span><span>o</span><span>a</span><span>r</span><span>d</span></span></div>
+                  <div class="term-gap"></div>
+                  <pre class="term-logo" data-in="3000,3140">████████╗ ██████╗
+╚══██╔══╝██╔════╝
+   ██║   ██║
+   ██║   ██║
+   ██║   ╚██████╗
+   ╚═╝    ╚═════╝</pre>
+                  <div class="term-gap"></div>
+                  <div class="term-line" data-in="3240,3380"><span><b>TeamCity CLI</b> — </span><span class="term-link">https://jb.gg/tc/docs</span></div>
+                  <div class="term-gap"></div>
+                  <div class="term-line" data-in="3470,3610">Usage: teamcity &lt;command&gt; [flags]</div>
+                  <div class="term-gap"></div>
+                  <div class="term-line" data-in="3700,3840">Common commands:</div>
+                  <div class="term-line term-cmd" data-in="3840,3980"><span>  auth login</span><span>Authenticate (or set TEAMCITY_URL + TEAMCITY_TOKEN)</span></div>
+                  <div class="term-line term-cmd" data-in="3980,4120"><span>  run list</span><span>List recent runs</span></div>
+                  <div class="term-line term-cmd" data-in="4120,4260"><span>  run start &lt;job&gt;</span><span>Trigger a new run</span></div>
+                  <div class="term-line term-cmd" data-in="4260,4400"><span>  run view &lt;id&gt;</span><span>View run details</span></div>
+                  <div class="term-line term-cmd" data-in="4400,4540"><span>  job list</span><span>List jobs</span></div>
+                  <div class="term-gap"></div>
+                  <div class="term-line term-hint" data-in="4580,4720">Run 'teamcity -h' for full command list, or 'teamcity &lt;command&gt; -h' for details</div>
+                  <div class="term-gap"></div>
+                  <div class="term-gap"></div>
+                  <div class="term-bottom">
+                    <div class="term-line" data-in="4950,5070"><span>your.terminal ~ % </span><span class="term-type" data-type="5200,38.82"><span>t</span><span>e</span><span>a</span><span>m</span><span>c</span><span>i</span><span>t</span><span>y</span><span> </span><span>r</span><span>u</span><span>n</span><span> </span><span>s</span><span>t</span><span>a</span><span>r</span><span>t</span><span> </span><span>P</span><span>i</span><span>p</span><span>e</span><span>l</span><span>i</span><span>n</span><span>e</span><span>P</span><span>r</span><span>o</span><span>j</span><span>e</span><span>c</span><span>t</span></span></div>
+                    <div class="term-line" data-in="7680,7880">✓ Started run#20 for PipelineProject</div>
+                    <div class="term-status" data-in="6800,6900" data-out="7680,7880"><img class="term-spin" src="assets/cli/spinner-start.svg" alt="">Starting run#20 for PipelineProject</div>
+                    <div class="term-status term-status-2" data-in="8080,8180" data-out="9440,9640"><img class="term-spin" src="assets/cli/spinner-build.svg" alt="">Build #20 in progress</div>
+                    <div class="term-ok" data-in="9440,9640">✓ Build #20 successful</div>
+                    <span class="term-cursor term-cursor-run" data-cursor="run"></span>
+                  </div>
+                  <span class="term-cursor term-cursor-1" data-cursor="onboard"></span>
+                  <div class="term-install" data-in="1720,1800" data-out="2800,2960">
+                    <img class="term-spin" src="assets/cli/spinner-install.svg" alt="">
+                    <span>TeamCity CLI is installing...</span>
+                    <i class="term-rail"></i><i class="term-progress"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tc-nav">
+              <div class="tc-nav-top">
+                <span class="tc-nav-glow"><img src="assets/ui/nav-glow.svg" alt=""></span>
+                <span class="tc-nav-logo"><img src="assets/ui/tc-logo.svg" alt=""></span>
+                <span class="tc-nav-item is-active"><span class="tc-nav-ic"><img src="assets/ui/nav-projects.svg" alt=""></span>Projects</span>
+                <span class="tc-nav-item"><span class="tc-nav-ic"><img src="assets/ui/nav-agents.svg" alt=""></span><b>6k</b>Agents</span>
+                <span class="tc-nav-item"><span class="tc-nav-ic"><img src="assets/ui/nav-queue.svg" alt=""></span><b>710</b>Queue</span>
+                <span class="tc-nav-item"><span class="tc-nav-ic"><img src="assets/ui/nav-changes.svg" alt=""></span>Changes</span>
+                <span class="tc-nav-item"><span class="tc-nav-ic"><img src="assets/ui/nav-admin.svg" alt=""></span>Admin</span>
+              </div>
+              <div class="tc-nav-foot">
+                <span class="tc-nav-ic"><img src="assets/ui/nav-help.svg" alt=""></span>
+                <span class="tc-avatar"><img src="assets/ui/avatar.png" alt=""></span>
+              </div>
+            </div>
+
+            <div class="tc-subnav">
+              <span class="tc-subnav-btn"><img src="assets/ui/subnav-add.svg" alt=""></span>
+              <span class="tc-subnav-div"></span>
+              <img class="tc-subnav-arrow" src="assets/ui/double-arrow-right.svg" alt="">
+            </div>
           </div>
         </div>
       </div>
-      <div class="video-neutralize"></div>
-      <div class="video-tint"></div>
-    </div>
+    </section>
 
-    <section class="cards" aria-label="What TeamCity offers">
-      <article class="card reveal" style="--d: 700ms">
-        <img class="card-glow" src="assets/card-stack-header.svg" alt="" width="964.251" height="135.277">
-        <h2>...works with any VCS you already have</h2>
-        <div class="card-art vcs" role="img" aria-label="GitHub, GitLab and Bitbucket">
-          <span class="vcs-logo vcs-github" style="--i: 0"><img src="assets/vcs/github.svg" alt="" width="80" height="80"></span>
-          <span class="vcs-logo vcs-gitlab" style="--i: 1">
-            <img class="gl-g44" src="assets/vcs/gitlab-g44.svg" alt="">
-            <img class="gl-g48" src="assets/vcs/gitlab-g48.svg" alt="">
-            <img class="gl-g56" src="assets/vcs/gitlab-g56.svg" alt="">
-            <img class="gl-g64" src="assets/vcs/gitlab-g64.svg" alt="">
-            <img class="gl-g72" src="assets/vcs/gitlab-g72.svg" alt="">
-            <img class="gl-g76" src="assets/vcs/gitlab-g76.svg" alt="">
-            <img class="gl-g80" src="assets/vcs/gitlab-g80.svg" alt="">
-            <img class="gl-g84" src="assets/vcs/gitlab-g84.svg" alt="">
-          </span>
-          <span class="vcs-logo vcs-bitbucket" style="--i: 2"><img src="assets/vcs/bitbucket.svg" alt="" width="63.9994" height="55.9998"></span>
-        </div>
-      </article>
-      <article class="card reveal" style="--d: 820ms">
-        <img class="card-glow" src="assets/card-stack-header.svg" alt="" width="964.251" height="135.277">
-        <h2>...or even when VCS is down</h2>
-        <div class="card-art pipeline" aria-hidden="true">
-          <span class="pl-connector"><span><img src="assets/pipeline/connector-h.svg" alt=""></span></span>
-          <img class="pl-dependency" src="assets/pipeline/dependency-line.svg" alt="" width="28.8152" height="90.0474">
-          <div class="job job-done">
-            <div class="job-status"><img src="assets/pipeline/icon-success.svg" alt="" width="14.4076" height="14.4076"><span>2m 22s</span></div>
-            <div class="job-name">Publish artifacts</div>
-            <div class="job-sub">Success</div>
-          </div>
-          <div class="pl-column">
-            <div class="job job-running" data-seconds="26">
-              <span class="job-load"></span>
-              <div class="job-status"><img class="spin" src="assets/pipeline/icon-running.svg" alt="" width="14.4076" height="14.4076"><span class="job-time">26s left</span></div>
-              <div class="job-name">Jobs name</div>
-              <div class="job-sub">Step 1/2</div>
-            </div>
-            <div class="job job-running" data-seconds="22">
-              <span class="job-load"></span>
-              <div class="job-status"><img class="spin" src="assets/pipeline/icon-running.svg" alt="" width="14.4076" height="14.4076"><span class="job-time">22s left</span></div>
-              <div class="job-name">Jobs name</div>
-              <div class="job-sub">Step 1/2</div>
-            </div>
+    <!-- Customer quote -->
+    <section class="section quote wrap" aria-labelledby="quote-title">
+      <h2 class="quote-title sr" id="quote-title">Hear from our customers</h2>
+      <figure class="sr" style="--d: 100ms">
+        <blockquote><p>“We were seeing around a 70% reduction in build times. Instead of 10 minutes, it was three or four minutes.”</p></blockquote>
+        <figcaption>– Bruce Blair, CTO at Ziax</figcaption>
+      </figure>
+    </section>
+
+    <!-- Give your project a new place to build -->
+    <section class="section start wrap" id="get-started">
+      <h2 class="h1 sr">Give your project a new place to build</h2>
+      <p class="lead sr">Create your free TeamCity Cloud instance, then continue in your terminal, where your AI agents configure and run your project’s core build and tests. Or as an alternative use TeamCity in the browser.</p>
+      <p class="lead lead-2 sr">Use your own repository or try a demo project.</p>
+      <a class="btn btn-lg sr" href="https://www.jetbrains.com/teamcity/cloud/">Start a free trial</a>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section faq wrap" aria-labelledby="faq-title">
+      <h2 class="h1 sr" id="faq-title">Before you get started</h2>
+      <div class="faq-list sr" data-accordion="multi">
+        <div class="acc-item">
+          <h3><button class="acc-trigger" type="button" aria-expanded="false" aria-controls="faq-1" id="faq-1-btn"><span>Do I need to move my code away from GitHub?</span><i class="pm" aria-hidden="true"></i></button></h3>
+          <div class="acc-panel" id="faq-1" role="region" aria-labelledby="faq-1-btn" hidden>
+            <div class="acc-inner"><p>No. Connect your GitHub repository to TeamCity and evaluate a different CI platform while keeping your code where it is.</p></div>
           </div>
         </div>
-      </article>
-      <article class="card reveal" style="--d: 940ms">
-        <img class="card-glow" src="assets/card-stack-header.svg" alt="" width="964.251" height="135.277">
-        <h2>...works well with your AI agents</h2>
-        <div class="card-art agents" role="img" aria-label="TeamCity connected to OpenAI, Copilot, Claude, Cursor and Junie">
-          <span class="ag-line ag-line-1"><span><img src="assets/agents/line-1.svg" alt=""></span></span>
-          <span class="ag-line ag-line-2"><span><img src="assets/agents/line-2.svg" alt=""></span></span>
-          <span class="ag-line ag-line-3"><span><img src="assets/agents/line-3.svg" alt=""></span></span>
-          <span class="ag-line ag-line-4"><span><img src="assets/agents/line-4.svg" alt=""></span></span>
-          <span class="ag-line ag-line-5"><span><img src="assets/agents/line-5.svg" alt=""></span></span>
-          <span class="chip chip-openai" style="--i: 0"><i></i><img src="assets/agents/openai.svg" alt="" width="24.1045" height="23.8893"></span>
-          <span class="chip chip-cursor chip-dim" style="--i: 3"><i></i><img src="assets/agents/cursor.svg" alt="" width="24.1045" height="27.4797"></span>
-          <span class="chip chip-copilot chip-dim" style="--i: 1"><i></i><img src="assets/agents/copilot.svg" alt="" width="24.1045" height="20.2167"></span>
-          <span class="chip chip-claude" style="--i: 2"><i></i><img src="assets/agents/claude.svg" alt="" width="24.1045" height="24.1045"></span>
-          <span class="chip chip-junie" style="--i: 4"><i></i><img src="assets/agents/junie.svg" alt="" width="24.1045" height="25.5224"></span>
-          <img class="ag-teamcity" src="assets/agents/teamcity-mark.svg" alt="" width="54.3791" height="54.3791">
+        <div class="acc-item">
+          <h3><button class="acc-trigger" type="button" aria-expanded="false" aria-controls="faq-2" id="faq-2-btn"><span>Does AI-assisted setup migrate my entire workflow?</span><i class="pm" aria-hidden="true"></i></button></h3>
+          <div class="acc-panel" id="faq-2" role="region" aria-labelledby="faq-2-btn" hidden>
+            <div class="acc-inner"><p>The campaign setup focuses on your project’s core build and tests. Deployment steps, secrets, triggers, and other workflow behavior need separate review. Treat the first build as the start of your evaluation.</p></div>
+          </div>
         </div>
-      </article>
+        <div class="acc-item">
+          <h3><button class="acc-trigger" type="button" aria-expanded="false" aria-controls="faq-3" id="faq-3-btn"><span>How do CLI and MCP differ?</span><i class="pm" aria-hidden="true"></i></button></h3>
+          <div class="acc-panel" id="faq-3" role="region" aria-labelledby="faq-3-btn" hidden>
+            <div class="acc-inner"><p>The CLI lets you and your agent work with TeamCity through terminal commands. MCP exposes TeamCity tools to compatible AI clients. Choose the integration that fits how you work; the campaign’s onboarding uses the CLI.</p></div>
+          </div>
+        </div>
+        <div class="acc-item">
+          <h3><button class="acc-trigger" type="button" aria-expanded="false" aria-controls="faq-4" id="faq-4-btn"><span>Can I choose where builds run?</span><i class="pm" aria-hidden="true"></i></button></h3>
+          <div class="acc-panel" id="faq-4" role="region" aria-labelledby="faq-4-btn" hidden>
+            <div class="acc-inner"><p>TeamCity supports cloud and self-hosted build agents. Choose infrastructure that fits your toolchain and workload. Options depend on your TeamCity deployment and plan.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="section cta wrap">
+      <h2 class="hero-h sr">Ready to take TeamCity for a spin?</h2>
+      <p class="lead sr">Try it with your project, or talk to our team about your GitHub Actions setup.</p>
+      <div class="actions sr">
+        <a class="btn btn-lg" href="https://www.jetbrains.com/teamcity/cloud/">Start a free trial</a>
+        <a class="btn btn-lg btn-outline" href="https://www.jetbrains.com/teamcity/contact-us/">Get in touch</a>
+      </div>
     </section>
   </main>
 

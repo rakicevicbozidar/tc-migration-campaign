@@ -1,0 +1,25 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="2142.8" height="1189.8" viewBox="0 0 2142.8 1189.8" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="layer blur" filter="url(#filter0_f_0_3169)">
+<g clip-path="url(#clip0_0_3169)">
+<rect width="1977" height="1024" transform="translate(82.9 82.9)" fill="black"/>
+<g id="hero-bg" opacity="0.4" filter="url(#filter1_f_0_3169)">
+<path d="M214.096 -88.5888C214.096 87.3078 597.599 229.9 1070.67 229.9C1543.75 229.9 1927.25 87.3077 1927.25 -88.589C1927.25 -159.245 1962.34 -269.496 1857.63 -322.321C1701.67 -401.002 1353.72 -407.078 1070.67 -407.078C752.354 -407.078 411.49 -410.975 263.825 -315.15C192.036 -268.563 214.096 -146.129 214.096 -88.5888Z" fill="#0A3FC5"/>
+</g>
+</g>
+</g>
+<defs>
+<filter id="filter0_f_0_3169" x="0" y="0" width="2142.8" height="1189.8" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="41.45" result="effect1_foregroundBlur_0_3169"/>
+</filter>
+<filter id="filter1_f_0_3169" x="-45.1" y="-663.1" width="2234" height="1149" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="128" result="effect1_foregroundBlur_0_3169"/>
+</filter>
+<clipPath id="clip0_0_3169">
+<rect width="1977" height="1024" fill="white" transform="translate(82.9 82.9)"/>
+</clipPath>
+</defs>
+</svg>

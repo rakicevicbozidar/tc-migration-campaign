@@ -1,6 +1,9 @@
 (() => {
+  const root = document.documentElement;
   const body = document.body;
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  root.classList.add("js");
 
   const INTRO_HOLD = 2600;   // loading screen on-screen time (ms)
   const DISSOLVE_MS = 1250;  // intro brand fades out while the landing fades in
@@ -9,20 +12,42 @@
   document.querySelectorAll(".hero-title .w").forEach((word, i) => {
     const inner = document.createElement("span");
     inner.textContent = word.textContent;
-    inner.style.setProperty("--d", `${380 + i * 70}ms`);
+    inner.style.setProperty("--d", `${380 + i * 60}ms`);
     word.textContent = "";
     word.setAttribute("aria-hidden", "true");
     word.appendChild(inner);
   });
 
-  /* ---------------- Video: swap the coded stand-in for the real clip once it exists ---------------- */
+  /* ---------------- A/B test: report CTA clicks with the assigned variant ---------------- */
+  const variant = root.dataset.variant || "a";
+  document.querySelectorAll("a.btn").forEach((link) => {
+    link.addEventListener("click", () => {
+      (window.dataLayer = window.dataLayer || []).push({
+        event: "cta_click",
+        experiment: "hero_layout",
+        variant,
+        label: link.textContent.trim(),
+        location: link.closest("section, header")?.className.split(" ")[0] || "page",
+      });
+    });
+  });
+
+  /* ---------------- Video: fade in once the first frame is ready ---------------- */
   const videoPanel = document.querySelector(".hero-video");
   const video = videoPanel.querySelector("video");
-  video.addEventListener("loadeddata", () => videoPanel.classList.add("has-video"));
+  if (video.readyState >= 2) videoPanel.classList.add("has-video");
+  else video.addEventListener("loadeddata", () => videoPanel.classList.add("has-video"));
 
   /* ---------------- Intro sequence ---------------- */
   let started = false;
   let holdTimer;
+
+  function ready() {
+    body.classList.remove("is-loading", "is-transitioning");
+    body.classList.add("is-ready");
+    const intro = document.querySelector(".intro");
+    if (intro) intro.remove();
+  }
 
   function startTransition() {
     if (started) return;
@@ -31,22 +56,15 @@
 
     body.classList.remove("is-loading");
     body.classList.add("is-transitioning");
-
-    setTimeout(() => {
-      body.classList.remove("is-transitioning");
-      body.classList.add("is-ready");
-      document.querySelector(".intro").remove();
-      startTerminal();
-      startJobs();
-    }, DISSOLVE_MS);
+    setTimeout(ready, DISSOLVE_MS);
   }
 
   if (reduceMotion) {
-    body.classList.remove("is-loading");
-    body.classList.add("is-ready");
-    document.querySelector(".intro").remove();
-    startTerminal();
-    startJobs();
+    ready();
+  } else if (root.classList.contains("no-intro")) {
+    // Reload / return visit: skip the loading screen, play only the landing reveal
+    void body.offsetWidth;
+    ready();
   } else {
     // Let fonts settle so the intro text renders in its final face.
     const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
@@ -56,12 +74,229 @@
       holdTimer = setTimeout(startTransition, INTRO_HOLD);
     });
 
-    const intro = document.querySelector(".intro");
-    intro.addEventListener("click", startTransition);
+    document.querySelector(".intro").addEventListener("click", startTransition);
     window.addEventListener("keydown", startTransition, { once: true });
     window.addEventListener("wheel", startTransition, { once: true, passive: true });
     window.addEventListener("touchmove", startTransition, { once: true, passive: true });
   }
+
+  /* ---------------- Scroll reveal ---------------- */
+  const revealables = document.querySelectorAll(".sr");
+  if (reduceMotion || !("IntersectionObserver" in window)) {
+    revealables.forEach((el) => el.classList.add("in"));
+  } else {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("in");
+        io.unobserve(entry.target);
+      });
+    }, { rootMargin: "0px 0px -6% 0px", threshold: 0 });
+    revealables.forEach((el) => io.observe(el));
+
+    // Anything still hidden once the page is scrolled to the very end shows up anyway
+    const revealRest = () => {
+      if (window.innerHeight + window.scrollY < document.documentElement.scrollHeight - 4) return;
+      revealables.forEach((el) => { el.classList.add("in"); io.unobserve(el); });
+      window.removeEventListener("scroll", revealRest);
+    };
+    window.addEventListener("scroll", revealRest, { passive: true });
+  }
+
+  /* ---------------- Logo strip: duplicate the list for a seamless loop ---------------- */
+  const logoGrid = document.querySelector(".logo-grid");
+  const logos = logoGrid.querySelector(".logos");
+  const track = document.createElement("div");
+  track.className = "logo-track";
+  const copy = logos.cloneNode(true);
+  copy.setAttribute("aria-hidden", "true");
+  logoGrid.appendChild(track);
+  track.append(logos, copy);
+
+  /* ---------------- Feature picture follows the open feature ---------------- */
+  const shot = document.querySelector(".tc-shot");
+  const SHOT_LABELS = {
+    pipeline: "TeamCity pipeline editor with Build, Test and Security scan jobs",
+    code: "TeamCity pipeline settings shown as YAML and Kotlin DSL",
+    cli: "Terminal running teamcity onboard, then starting a build with the TeamCity CLI",
+  };
+  const showView = (view) => {
+    if (!view || shot.dataset.view === view) return;
+    shot.dataset.view = view;
+    shot.setAttribute("aria-label", SHOT_LABELS[view]);
+    if (view === "cli") terminal.restart();
+    else terminal.sync();
+    code.sync();
+  };
+
+  /* ---------------- CLI terminal: 10.8s loop, timings from the Figma prototype ---------------- */
+  const terminal = (() => {
+    const LOOP = 10800;
+    const term = shot.querySelector(".term");
+    const clamp01 = (v) => Math.min(1, Math.max(0, v));
+    const ramp = (t, [a, b]) => clamp01((t - a) / (b - a));
+    const range = (attr) => attr && attr.split(",").map(Number);
+
+    const fades = [...term.querySelectorAll("[data-in]")].map((el) => ({
+      el, inn: range(el.dataset.in), out: range(el.dataset.out),
+    }));
+    const typed = [...term.querySelectorAll(".term-type")].map((el) => {
+      const [start, step] = range(el.dataset.type);
+      return { chars: [...el.children], start, step };
+    });
+    const cursors = {
+      onboard: { el: term.querySelector('[data-cursor="onboard"]'), start: 550, step: 65.1, max: 16, dx: 7.2373,
+        on: (t) => t < 240 || (t >= 480 && t < 1680) },
+      run: { el: term.querySelector('[data-cursor="run"]'), start: 5200, step: 40, max: 34, dx: 7.2457,
+        on: (t) => (t >= 4950 && t < 5189) || (t >= 5200 && t < 6750) },
+    };
+    const progress = term.querySelector(".term-progress");
+
+    const render = (t) => {
+      fades.forEach(({ el, inn, out }) => {
+        el.style.opacity = ramp(t, inn) * (out ? 1 - ramp(t, out) : 1);
+      });
+      typed.forEach(({ chars, start, step }) => {
+        chars.forEach((c, i) => { c.style.opacity = clamp01((t - start - i * step) / step); });
+      });
+      Object.values(cursors).forEach((c) => {
+        const n = Math.min(c.max, Math.max(0, Math.floor((t - c.start) / c.step) + 1));
+        c.el.style.opacity = c.on(t) ? 1 : 0;
+        c.el.style.transform = `translateX(${n * c.dx}px)`;
+      });
+      progress.style.width = `${ramp(t, [1800, 2800]) * 244.082}px`;
+    };
+
+    let t0 = 0;
+    let raf = 0;
+    let inView = false;
+    const tick = (now) => {
+      render((now - t0) % LOOP);
+      raf = requestAnimationFrame(tick);
+    };
+    const sync = () => {
+      const play = !reduceMotion && inView && shot.dataset.view === "cli";
+      if (play && !raf) raf = requestAnimationFrame(tick);
+      if (!play && raf) { cancelAnimationFrame(raf); raf = 0; }
+    };
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(([e]) => { inView = e.isIntersecting; sync(); }).observe(shot);
+    } else inView = true;
+
+    render(reduceMotion ? LOOP - 1 : 0);
+    return {
+      restart() { t0 = performance.now(); render(reduceMotion ? LOOP - 1 : 0); sync(); },
+      sync,
+    };
+  })();
+
+  /* ---------------- Configuration as code: lines type in, then YAML ⇄ Kotlin DSL ---------------- */
+  const code = (() => {
+    const LINE_MS = 85;   // one line every 85ms
+    const HOLD_MS = 2600; // pause on the finished file before switching tabs
+    const tabs = [...shot.querySelectorAll(".tc-tabs button")];
+    const blocks = [...shot.querySelectorAll(".tc-code")];
+    const caret = document.createElement("span");
+    caret.className = "tc-caret";
+
+    let current = "yaml";
+    let auto = true; // stops once the visitor picks a tab
+    let timers = [];
+    let playing = false;
+    let inView = false;
+    const clear = () => { timers.forEach(clearTimeout); timers = []; };
+
+    const show = (name) => {
+      current = name;
+      tabs.forEach((t) => t.classList.toggle("is-on", t.dataset.tab === name));
+      blocks.forEach((c) => { c.hidden = c.dataset.code !== name; });
+    };
+
+    const play = (name) => {
+      clear();
+      show(name);
+      const block = blocks.find((c) => c.dataset.code === name);
+      const rows = [...block.querySelectorAll(".tc-row")];
+      if (reduceMotion) { block.classList.remove("is-typing"); return; }
+
+      block.classList.add("is-typing");
+      rows.forEach((r) => r.classList.remove("on"));
+      void block.offsetWidth;
+      rows.forEach((row, i) => {
+        const chars = row.querySelector(".tc-tx").textContent.length;
+        row.style.setProperty("--steps", Math.max(1, Math.min(chars, 40)));
+        row.style.setProperty("--type", `${Math.min(70 + chars * 9, 420)}ms`);
+        timers.push(setTimeout(() => {
+          row.classList.add("on");
+          row.querySelector(".tc-tx").appendChild(caret);
+        }, 250 + i * LINE_MS));
+      });
+      const done = 250 + rows.length * LINE_MS + 400;
+      timers.push(setTimeout(() => {
+        if (!auto) return;
+        timers.push(setTimeout(() => play(current === "yaml" ? "kotlin" : "yaml"), HOLD_MS));
+      }, done));
+    };
+
+    const sync = () => {
+      const should = inView && shot.dataset.view === "code";
+      if (should && !playing) { playing = true; play(current); }
+      if (!should && playing) { playing = false; clear(); }
+    };
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(([e]) => { inView = e.isIntersecting; sync(); }).observe(shot);
+    } else inView = true;
+
+    // "Visual" jumps to the visual editor feature; YAML / Kotlin DSL switch the file
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        if (tab.dataset.tab === "visual") {
+          document.querySelector('.accordion [data-view="pipeline"] .acc-trigger').click();
+          return;
+        }
+        auto = false;
+        play(tab.dataset.tab);
+      });
+    });
+
+    return { sync };
+  })();
+
+  /* ---------------- Accordions ---------------- */
+  document.querySelectorAll("[data-accordion]").forEach((group) => {
+    const single = group.dataset.accordion === "single";
+    const items = [...group.querySelectorAll(".acc-item")];
+
+    const setOpen = (item, open) => {
+      const trigger = item.querySelector(".acc-trigger");
+      const panel = item.querySelector(".acc-panel");
+      item.classList.toggle("is-open", open);
+      if (open && item.dataset.view) showView(item.dataset.view);
+      trigger.setAttribute("aria-expanded", String(open));
+      panel.inert = !open;
+    };
+
+    items.forEach((item) => {
+      const panel = item.querySelector(".acc-panel");
+      panel.hidden = false; // JS drives visibility via the grid-rows transition
+      setOpen(item, item.classList.contains("is-open"));
+
+      item.querySelector(".acc-trigger").addEventListener("click", () => {
+        const open = !item.classList.contains("is-open");
+        if (single) {
+          if (!open) return; // keep one feature open at all times
+          items.forEach((other) => other !== item && setOpen(other, false));
+        }
+        setOpen(item, open);
+      });
+    });
+  });
+
+  /* ---------------- UI mock: scale the 708×472 drawing to its slot ---------------- */
+  const fitShot = () => shot.style.setProperty("--k", shot.offsetWidth / 708);
+  fitShot();
+  if ("ResizeObserver" in window) new ResizeObserver(fitShot).observe(shot);
+  else window.addEventListener("resize", fitShot);
 
   /* ---------------- Pointer: card spotlight + tilt, ambient parallax ---------------- */
   if (!reduceMotion && window.matchMedia("(hover: hover)").matches) {
@@ -91,96 +326,7 @@
         const ny = e.clientY / window.innerHeight - 0.5;
         heroBg.style.setProperty("--px", `${nx * 40}px`);
         heroBg.style.setProperty("--py", `${ny * 30}px`);
-        videoPanel.style.setProperty("--vx", `${nx * -14}px`);
-        videoPanel.style.setProperty("--vy", `${ny * -10}px`);
       });
     });
-  }
-
-  /* ---------------- Card 2: running jobs count down while their load bars fill ---------------- */
-  function startJobs() {
-    const LOAD_MIN = 30.616; // load width in the design at the starting time
-    const LOAD_MAX = 171.99; // job width minus the 1.8px inset on both sides
-
-    document.querySelectorAll(".job-running").forEach((job) => {
-      const start = Number(job.dataset.seconds);
-      const time = job.querySelector(".job-time");
-      let left = start;
-
-      const render = () => {
-        time.textContent = `${left}s left`;
-        const done = 1 - left / start;
-        job.style.setProperty("--load", `${LOAD_MIN + (LOAD_MAX - LOAD_MIN) * done}px`);
-      };
-      render();
-      if (reduceMotion) return;
-
-      setInterval(() => {
-        left = left > 0 ? left - 1 : start;
-        render();
-      }, 1000);
-    });
-  }
-
-  /* ---------------- Terminal stand-in for the pipeline demo video ---------------- */
-  function startTerminal() {
-    if (videoPanel.classList.contains("has-video")) return;
-
-    const term = videoPanel.querySelector(".term");
-    const input = term.querySelector(".term-input");
-    const output = term.querySelector(".term-output");
-    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-
-    const script = [
-      { type: "migrate .github/workflows to TeamCity" },
-      { out: "✓ Found 3 workflows · 14 jobs", ok: true, pause: 650 },
-      { out: "✓ Generated Kotlin DSL build configurations", ok: true, pause: 750 },
-      { out: "✓ Reused your existing VCS root", ok: true, pause: 650 },
-      { out: "● Running first build…", pause: 1100 },
-      { out: "✓ Build #1 passed in 2m 14s", ok: true, pause: 3200 },
-    ];
-
-    async function typeText(text) {
-      term.classList.add("is-typing");
-      for (const ch of text) {
-        input.textContent += ch;
-        await wait(38 + Math.random() * 55);
-      }
-      term.classList.remove("is-typing");
-    }
-
-    async function loop() {
-      if (reduceMotion) {
-        input.textContent = script[0].type;
-        script.slice(1).forEach((step) => addLine(step));
-        return;
-      }
-      for (;;) {
-        input.textContent = "";
-        output.textContent = "";
-        await wait(1200);
-        for (const step of script) {
-          if (step.type) {
-            await typeText(step.type);
-            await wait(450);
-            input.textContent = "";
-            addLine({ out: `› ${step.type}` });
-          } else {
-            addLine(step);
-            await wait(step.pause);
-          }
-        }
-      }
-    }
-
-    function addLine(step) {
-      const line = document.createElement("div");
-      line.textContent = step.out;
-      if (step.ok) line.className = "ok";
-      output.appendChild(line);
-      while (output.children.length > 4) output.firstElementChild.remove();
-    }
-
-    loop();
   }
 })();

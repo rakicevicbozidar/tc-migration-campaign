@@ -1,0 +1,35 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="964.251" height="135.277" viewBox="0 0 964.251 135.277" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="stack-header">
+<mask id="mask0_0_2961" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="965" height="136">
+<rect id="bg-shape" width="964.251" height="135.276" fill="white"/>
+</mask>
+<g mask="url(#mask0_0_2961)">
+<g id="glow-ellipse-2" filter="url(#filter0_f_0_2961)">
+<ellipse cx="482.126" cy="179.348" rx="439.608" ry="77.9193" fill="#0A3FC5"/>
+</g>
+<g id="glow-ellipse-3" opacity="0.8" filter="url(#filter1_f_0_2961)">
+<ellipse cx="482.126" cy="163.653" rx="288.794" ry="30.3019" fill="white"/>
+</g>
+<g id="glow-ellipse-5" filter="url(#filter2_f_0_2961)">
+<ellipse cx="131.013" cy="174.625" rx="206.167" ry="40.0418" fill="#B2D5FF"/>
+</g>
+</g>
+</g>
+<defs>
+<filter id="filter0_f_0_2961" x="-26.744" y="32.1672" width="1017.74" height="294.362" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="34.6308" result="effect1_foregroundBlur_0_2961"/>
+</filter>
+<filter id="filter1_f_0_2961" x="141.386" y="81.4044" width="681.48" height="164.496" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="25.9731" result="effect1_foregroundBlur_0_2961"/>
+</filter>
+<filter id="filter2_f_0_2961" x="-101.127" y="108.61" width="464.28" height="132.03" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="12.9865" result="effect1_foregroundBlur_0_2961"/>
+</filter>
+</defs>
+</svg>
