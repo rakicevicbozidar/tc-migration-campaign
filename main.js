@@ -20,6 +20,14 @@
 
   /* ---------------- A/B test: report CTA clicks with the assigned variant ---------------- */
   const variant = root.dataset.variant || "a";
+
+  // Plan A leads with the trial: "Start a free trial" first, "Schedule a demo" second.
+  // Swapped in the DOM (not with CSS order) so keyboard focus follows what is on screen.
+  if (variant === "a") {
+    const heroActions = document.querySelector(".hero .actions");
+    const trial = heroActions.querySelector(".btn:not(.btn-outline)");
+    heroActions.prepend(trial);
+  }
   document.querySelectorAll("a.btn").forEach((link) => {
     link.addEventListener("click", () => {
       (window.dataLayer = window.dataLayer || []).push({
@@ -42,11 +50,17 @@
   let started = false;
   let holdTimer;
 
-  function ready() {
+  // The hero heading, sub-line and buttons are in ~1.4s after the landing starts to show (the video
+  // keeps easing in after that). Sections already on the first screen wait for them, so they never
+  // draw the eye before the main header.
+  const HERO_ENTRANCE_MS = 1400;
+
+  function ready(alreadyShownMs = 0) {
     body.classList.remove("is-loading", "is-transitioning");
     body.classList.add("is-ready");
     const intro = document.querySelector(".intro");
     if (intro) intro.remove();
+    startScrollReveal(Math.max(0, HERO_ENTRANCE_MS - alreadyShownMs));
   }
 
   function startTransition() {
@@ -56,7 +70,7 @@
 
     body.classList.remove("is-loading");
     body.classList.add("is-transitioning");
-    setTimeout(ready, DISSOLVE_MS);
+    setTimeout(() => ready(DISSOLVE_MS), DISSOLVE_MS);
   }
 
   if (reduceMotion) {
@@ -80,16 +94,24 @@
     window.addEventListener("touchmove", startTransition, { once: true, passive: true });
   }
 
-  /* ---------------- Scroll reveal ---------------- */
-  const revealables = document.querySelectorAll(".sr");
-  if (reduceMotion || !("IntersectionObserver" in window)) {
-    revealables.forEach((el) => el.classList.add("in"));
-  } else {
+  /* ---------------- Scroll reveal ----------------
+     Starts only once the landing is showing (called from ready()); otherwise sections that sit in
+     the first screen, such as "Keep your project" in Plan A, get revealed behind the loading screen
+     and show up fully drawn while the intro dissolves. */
+  function startScrollReveal(holdMs) {
+    const revealables = document.querySelectorAll(".sr");
+    const releaseAt = performance.now() + holdMs;
+    if (reduceMotion || !("IntersectionObserver" in window)) {
+      revealables.forEach((el) => el.classList.add("in"));
+      return;
+    }
     const io = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
-        entry.target.classList.add("in");
         io.unobserve(entry.target);
+        const wait = releaseAt - performance.now();
+        if (wait > 0) setTimeout(() => entry.target.classList.add("in"), wait);
+        else entry.target.classList.add("in");
       });
     }, { rootMargin: "0px 0px -6% 0px", threshold: 0 });
     revealables.forEach((el) => io.observe(el));
