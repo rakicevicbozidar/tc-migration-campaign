@@ -18,22 +18,11 @@
     word.appendChild(inner);
   });
 
-  /* ---------------- A/B test: report CTA clicks with the assigned variant ---------------- */
-  const variant = root.dataset.variant || "a";
-
-  // Plan A leads with the trial: "Start a free trial" first, "Schedule a demo" second.
-  // Swapped in the DOM (not with CSS order) so keyboard focus follows what is on screen.
-  if (variant === "a") {
-    const heroActions = document.querySelector(".hero .actions");
-    const trial = heroActions.querySelector(".btn:not(.btn-outline)");
-    heroActions.prepend(trial);
-  }
+  /* ---------------- Analytics: report CTA clicks to window.dataLayer ---------------- */
   document.querySelectorAll("a.btn").forEach((link) => {
     link.addEventListener("click", () => {
       (window.dataLayer = window.dataLayer || []).push({
         event: "cta_click",
-        experiment: "hero_layout",
-        variant,
         label: link.textContent.trim(),
         location: link.closest("section, header")?.className.split(" ")[0] || "page",
       });
@@ -214,8 +203,10 @@
 
   /* ---------------- Configuration as code: lines type in, then YAML ⇄ Kotlin DSL ---------------- */
   const code = (() => {
-    const LINE_MS = 85;   // one line every 85ms
-    const HOLD_MS = 2600; // pause on the finished file before switching tabs
+    const LINE_MS = 85;  // one line every 85ms
+    const LEAVE_MS = 200; // the finished file fades out before the other one types in
+    // pause on the finished file before switching: short after YAML, longer on Kotlin DSL
+    const HOLD_MS = { yaml: 900, kotlin: 2600 };
     const tabs = [...shot.querySelectorAll(".tc-tabs button")];
     const blocks = [...shot.querySelectorAll(".tc-code")];
     const caret = document.createElement("span");
@@ -234,8 +225,16 @@
       blocks.forEach((c) => { c.hidden = c.dataset.code !== name; });
     };
 
-    const play = (name) => {
+    const play = (name, fromAuto = false) => {
       clear();
+      const leaving = blocks.find((c) => !c.hidden);
+      if (fromAuto && leaving && !reduceMotion) {
+        leaving.classList.add("is-leaving");
+        timers.push(setTimeout(() => { leaving.classList.remove("is-leaving"); type(name); }, LEAVE_MS));
+      } else type(name);
+    };
+
+    const type = (name) => {
       show(name);
       const block = blocks.find((c) => c.dataset.code === name);
       const rows = [...block.querySelectorAll(".tc-row")];
@@ -246,8 +245,7 @@
       void block.offsetWidth;
       rows.forEach((row, i) => {
         const chars = row.querySelector(".tc-tx").textContent.length;
-        row.style.setProperty("--steps", Math.max(1, Math.min(chars, 40)));
-        row.style.setProperty("--type", `${Math.min(70 + chars * 9, 420)}ms`);
+        row.style.setProperty("--type", `${Math.min(160 + chars * 7, 460)}ms`);
         timers.push(setTimeout(() => {
           row.classList.add("on");
           row.querySelector(".tc-tx").appendChild(caret);
@@ -256,7 +254,7 @@
       const done = 250 + rows.length * LINE_MS + 400;
       timers.push(setTimeout(() => {
         if (!auto) return;
-        timers.push(setTimeout(() => play(current === "yaml" ? "kotlin" : "yaml"), HOLD_MS));
+        timers.push(setTimeout(() => play(current === "yaml" ? "kotlin" : "yaml", true), HOLD_MS[current]));
       }, done));
     };
 

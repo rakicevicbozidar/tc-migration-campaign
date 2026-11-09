@@ -444,11 +444,26 @@ main { padding-top: 76px; } /* header height */
 }
 
 /* ------------------------------------------------------------------
-   Hero
+   Hero (Figma "Landing page | Plan A"): text left (558px), demo video right
+   (734×412.875, 16px gap, 49px above the eyebrow, bleeding 76px past the content edge)
 ------------------------------------------------------------------- */
-.hero { padding-top: 120px; } /* heading block at y=196 */
+.hero {
+  --bleed: clamp(0px, (100vw - 1280px) / 2, 76px);
+  display: grid;
+  grid-template-columns: minmax(0, 558px) minmax(0, 1fr);
+  grid-template-areas:
+    "eyebrow video"
+    "title   video"
+    "sub     video"
+    "action  video";
+  grid-template-rows: auto auto auto 1fr;
+  column-gap: 16px;
+  align-content: start;
+  padding-top: 120px; /* heading block at y=196 */
+}
 
 .eyebrow {
+  grid-area: eyebrow;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -463,12 +478,12 @@ main { padding-top: 76px; } /* header height */
 .eyebrow img { width: 93.125px; height: 20px; }
 
 .hero-title {
-  max-width: 1232px;
+  grid-area: title;
   margin-top: 36px;
   font-weight: 600;
-  font-size: 72px;
-  line-height: 72px;
-  letter-spacing: -0.36px;
+  font-size: 43px;
+  line-height: 49px;
+  letter-spacing: -0.043px;
 }
 
 /* word-by-word mask reveal */
@@ -495,21 +510,21 @@ body.is-ready .hero-title .w > span {
 }
 
 .hero-sub {
-  max-width: 877px;
+  grid-area: sub;
   margin-top: 24px;
   color: var(--text-average);
-  font-weight: 300;
-  font-size: 29px;
-  line-height: 39px;
+  font-size: 20px;
+  line-height: 28px;
 }
 
 .actions { display: flex; flex-wrap: wrap; gap: 16px; }
 
 .hero-action {
+  grid-area: action;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 16px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
   margin-top: 60px;
 }
 .hero-note {
@@ -520,14 +535,15 @@ body.is-ready .hero-title .w > span {
   font-feature-settings: "ss20" 1, "lnum" 1, "tnum" 1;
 }
 
-/* Demo video, Plan B: 1000×562.5 centred under the actions */
 .hero-video {
+  grid-area: video;
+  align-self: start;
   position: relative;
-  width: min(1000px, 100%);
-  aspect-ratio: 16 / 9;
-  margin: 60px auto 0;
-  border: 1px solid var(--card-border);
-  border-radius: 16px;
+  width: calc(100% + var(--bleed));
+  aspect-ratio: 734 / 412.875;
+  margin-top: -49px;
+  border: 0.734px solid var(--card-border);
+  border-radius: 11.744px;
   overflow: hidden;
   background: #05070d;
   box-shadow: 0 40px 120px -40px rgba(10, 63, 197, 0.55);
@@ -544,73 +560,9 @@ body.is-ready .hero-title .w > span {
 .hero-video.has-video .video-media { opacity: 1; }
 
 /* ------------------------------------------------------------------
-   Variant A (Figma "Landing page | Plan A"): text left (558px), video right
-   (734×412.875, 16px gap, 49px above the eyebrow, bleeding 76px past the content edge)
-------------------------------------------------------------------- */
-html[data-variant="a"] .hero {
-  --bleed: clamp(0px, (100vw - 1280px) / 2, 76px);
-  display: grid;
-  grid-template-columns: minmax(0, 558px) minmax(0, 1fr);
-  grid-template-areas:
-    "eyebrow video"
-    "title   video"
-    "sub     video"
-    "action  video";
-  grid-template-rows: auto auto auto 1fr;
-  column-gap: 16px;
-  align-content: start;
-}
-html[data-variant="a"] .hero .eyebrow { grid-area: eyebrow; }
-html[data-variant="a"] .hero-title {
-  grid-area: title;
-  max-width: none;
-  font-size: 43px;
-  line-height: 49px;
-  letter-spacing: -0.043px;
-}
-html[data-variant="a"] .hero-sub {
-  grid-area: sub;
-  max-width: none;
-  font-weight: 400;
-  font-size: 20px;
-  line-height: 28px;
-}
-html[data-variant="a"] .hero-action {
-  grid-area: action;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-}
-html[data-variant="a"] .hero-video {
-  grid-area: video;
-  align-self: start;
-  width: calc(100% + var(--bleed));
-  aspect-ratio: 734 / 412.875;
-  margin: -49px 0 0;
-  border-width: 0.734px;
-  border-radius: 11.744px;
-}
-html[data-variant="a"] .why { margin-top: 140px; }
-
-@media (max-width: 1100px) {
-  html[data-variant="a"] .hero {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: "eyebrow" "title" "sub" "action" "video";
-    grid-template-rows: none;
-  }
-  html[data-variant="a"] .hero-title { font-size: 40px; line-height: 46px; }
-  html[data-variant="a"] .hero-video { width: 100%; margin-top: 48px; }
-  html[data-variant="a"] .why { margin-top: 100px; }
-}
-@media (max-width: 600px) {
-  html[data-variant="a"] .hero-title { font-size: 34px; line-height: 40px; }
-  html[data-variant="a"] .hero-sub { font-size: 18px; line-height: 26px; }
-}
-
-/* ------------------------------------------------------------------
    Sections
 ------------------------------------------------------------------- */
-.why { margin-top: 100px; }
+.why { margin-top: 140px; }
 .why .lead { margin-top: 24px; }
 
 .cards {
@@ -1128,10 +1080,19 @@ body.is-ready .tc-job-run .tc-load { animation: tc-load 7s var(--ease-io) infini
 .tc-tabs button { transition: background-color 300ms var(--ease-out), border-color 300ms var(--ease-out); }
 
 /* YAML / Kotlin DSL typing animation (driven by main.js) */
+.tc-code { transition: opacity 200ms var(--ease-out); }
+.tc-code.is-leaving { opacity: 0; }
+/* each line fades in while its text slides 6px and wipes open left to right */
 .tc-code.is-typing .tc-row { opacity: 0; }
-.tc-code.is-typing .tc-row .tc-tx { clip-path: inset(0 100% 0 0); }
-.tc-code.is-typing .tc-row.on { opacity: 1; transition: opacity 120ms linear; }
-.tc-code.is-typing .tc-row.on .tc-tx { clip-path: inset(0 0 0 0); transition: clip-path var(--type, 240ms) steps(var(--steps, 12), end); }
+.tc-code.is-typing .tc-row .tc-tx { clip-path: inset(0 100% 0 0); translate: -6px 0; }
+.tc-code.is-typing .tc-row.on { opacity: 1; transition: opacity 260ms var(--ease-out); }
+.tc-code.is-typing .tc-row.on .tc-tx {
+  clip-path: inset(0 0 0 0);
+  translate: 0 0;
+  transition:
+    clip-path var(--type, 260ms) cubic-bezier(0.33, 0.7, 0.35, 1),
+    translate 360ms var(--ease-out);
+}
 .tc-caret {
   display: inline-block;
   width: 6px;
@@ -1194,12 +1155,11 @@ body.is-ready .tc-job-run .tc-load { animation: tc-load 7s var(--ease-io) infini
 
 .term {
   position: absolute;
-  left: 37.06px; /* 818px in the design vs 781px for the other pictures */
-  top: 0.828px;
+  /* same 708×472 slot as the pipeline and YAML pictures; .tc-ui starts 0.828px outside the
+     frame (under its border), so inset by that much or the left/top stroke gets clipped */
+  inset: 0.828px;
   display: flex;
   flex-direction: column;
-  width: 636.884px;
-  height: 470px;
   border: 1.135px solid #375fad;
   border-radius: 16px;
   overflow: hidden;
@@ -1321,6 +1281,10 @@ body.is-ready .tc-job-run .tc-load { animation: tc-load 7s var(--ease-io) infini
    Give your project a new place to build
 ------------------------------------------------------------------- */
 .start { margin-top: 153px; }
+/* text left, the 160×160 TeamCity logo right, centred on the text block */
+.start-row { display: flex; align-items: center; gap: 36px; }
+.start-text { flex: 1; min-width: 0; }
+.start-logo { flex: none; width: 160px; height: 160px; }
 .start .lead { margin-top: 36px; }
 .start .lead-2 { margin-top: 24px; }
 .start .btn { margin-top: 36px; }
@@ -1371,9 +1335,15 @@ body.is-ready .tc-job-run .tc-load { animation: tc-load 7s var(--ease-io) infini
 }
 
 @media (max-width: 1100px) {
-  .hero { padding-top: 96px; }
-  .hero-title { font-size: 56px; line-height: 60px; }
-  .hero-sub { font-size: 24px; line-height: 34px; }
+  .hero {
+    padding-top: 96px;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "eyebrow" "title" "sub" "action" "video";
+    grid-template-rows: none;
+  }
+  .hero-title { font-size: 40px; line-height: 46px; }
+  .hero-video { width: 100%; margin-top: 48px; }
+  .why { margin-top: 100px; }
   .h1 { font-size: 36px; line-height: 42px; }
   .hero-h { font-size: 52px; line-height: 56px; }
   .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
@@ -1388,6 +1358,7 @@ body.is-ready .tc-job-run .tc-load { animation: tc-load 7s var(--ease-io) infini
 }
 
 @media (max-width: 860px) {
+  .start-logo { width: 96px; height: 96px; }
   .cards { grid-template-columns: 1fr; }
   .card h3 { min-height: 0; }
   .nav-links .btn-ghost { display: none; }
@@ -1395,10 +1366,11 @@ body.is-ready .tc-job-run .tc-load { animation: tc-load 7s var(--ease-io) infini
 
 @media (max-width: 600px) {
   :root { --gutter: 16px; }
+  .start-logo { display: none; }
   .nav-logo img { width: 128px; height: 30px; }
   .hero { padding-top: 64px; }
-  .hero-title { font-size: 40px; line-height: 44px; margin-top: 24px; }
-  .hero-sub { font-size: 20px; line-height: 28px; }
+  .hero-title { font-size: 34px; line-height: 40px; margin-top: 24px; }
+  .hero-sub { font-size: 18px; line-height: 26px; }
   .hero-action { margin-top: 40px; }
   .btn-lg { padding: 10px 24px; font-size: 17px; line-height: 24px; }
   .h1 { font-size: 30px; line-height: 36px; }

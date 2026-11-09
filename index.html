@@ -9,32 +9,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Fallbacks until JetBrains Sans files are added (see styles.css @font-face) -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3"><!-- bump ?v= on every change so browsers drop cached copies -->
+  <link rel="stylesheet" href="styles.css?v=5"><!-- bump ?v= on every change so browsers drop cached copies -->
   <!--
     Runs before first paint, so nothing flickers.
-
-    A/B test "hero_layout" (Figma: "Landing page | Plan A" / "Plan B"):
-      A = split hero, text left and the demo video right
-      B = centred hero, the demo video full width below
-    Force a variant with ?variant=a or ?variant=b (it sticks for that browser).
-    The assignment and every CTA click are pushed to window.dataLayer for GTM / analytics.
-
     Intro: the loading screen plays once per browser session; reloads go straight to the page.
+    CTA clicks are pushed to window.dataLayer for GTM / analytics (see main.js).
   -->
   <script>
     (function () {
       var root = document.documentElement;
       root.classList.add("js");
-
-      var KEY = "tc-ab-hero_layout-v2", OK = { a: 1, b: 1 }, v;
-      var forced = new URLSearchParams(location.search).get("variant");
-      try { v = localStorage.getItem(KEY); } catch (e) {}
-      if (forced && OK[forced.toLowerCase()]) v = forced.toLowerCase();
-      if (!OK[v]) v = Math.random() < 0.5 ? "a" : "b";
-      try { localStorage.setItem(KEY, v); } catch (e) {}
-      root.setAttribute("data-variant", v);
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({ event: "ab_assignment", experiment: "hero_layout", variant: v });
 
       var seen = false;
       try { seen = sessionStorage.getItem("tc-intro-seen") === "1"; } catch (e) {}
@@ -111,8 +95,8 @@
 
       <div class="hero-action reveal" style="--d: 820ms; --y: 40px">
         <div class="actions">
-          <a class="btn btn-lg btn-outline" href="https://www.jetbrains.com/teamcity/contact-us/">Schedule a demo</a>
           <a class="btn btn-lg" href="https://www.jetbrains.com/teamcity/cloud/">Start a free trial</a>
+          <a class="btn btn-lg btn-outline" href="https://www.jetbrains.com/teamcity/contact-us/">Schedule a demo</a>
         </div>
         <p class="hero-note">Free TeamCity Cloud access. AI-assisted setup.</p>
       </div>
@@ -447,9 +431,14 @@
 
     <!-- Give your project a new place to build -->
     <section class="section start wrap" id="get-started">
-      <h2 class="h1 sr">Give your project a new place to build</h2>
-      <p class="lead sr">Create your free TeamCity Cloud instance, then continue in your terminal, where your AI agents configure and run your project’s core build and tests. Or as an alternative use TeamCity in the browser.</p>
-      <p class="lead lead-2 sr">Use your own repository or try a demo project.</p>
+      <div class="start-row">
+        <div class="start-text">
+          <h2 class="h1 sr">Give your project a new place to build</h2>
+          <p class="lead sr">Create your free TeamCity Cloud instance, then continue in your terminal, where your AI agents configure and run your project’s core build and tests. Or as an alternative use TeamCity in the browser.</p>
+          <p class="lead lead-2 sr">Use your own repository or try a demo project.</p>
+        </div>
+        <img class="start-logo sr" style="--d: 150ms" src="assets/landing/teamcity-icon.svg" alt="" width="160" height="160">
+      </div>
       <a class="btn btn-lg sr" href="https://www.jetbrains.com/teamcity/cloud/">Start a free trial</a>
     </section>
 
@@ -495,6 +484,6 @@
     </section>
   </main>
 
-  <script src="main.js?v=3"></script>
+  <script src="main.js?v=5"></script>
 </body>
 </html>
