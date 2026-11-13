@@ -130,6 +130,7 @@
     pipeline: "TeamCity pipeline editor with Build, Test and Security scan jobs",
     code: "TeamCity pipeline settings shown as YAML and Kotlin DSL",
     cli: "Terminal running teamcity onboard, then starting a build with the TeamCity CLI",
+    tests: "TeamCity pipeline running five test jobs in parallel next to the Build job log",
   };
   const showView = (view) => {
     if (!view || shot.dataset.view === view) return;

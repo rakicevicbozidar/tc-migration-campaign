@@ -1045,7 +1045,8 @@ body.is-ready .tc-job-run .tc-load { animation: tc-load 7s var(--ease-io) infini
 }
 .tc-shot:not([data-view="pipeline"]) .tc-layer-pipeline,
 .tc-shot:not([data-view="code"]) .tc-layer-code,
-.tc-shot:not([data-view="cli"]) .tc-layer-cli {
+.tc-shot:not([data-view="cli"]) .tc-layer-cli,
+.tc-shot:not([data-view="tests"]) .tc-layer-tests {
   opacity: 0;
   visibility: hidden;
   transition: opacity 450ms var(--ease-out), visibility 0s linear 450ms;
@@ -1152,6 +1153,23 @@ body.is-ready .tc-job-run .tc-load { animation: tc-load 7s var(--ease-io) infini
 .tc-shot[data-view="cli"] { border-color: transparent; background: transparent; box-shadow: none; }
 .tc-canvas, .tc-nav, .tc-subnav { transition: opacity 450ms var(--ease-out); }
 .tc-shot[data-view="cli"] :is(.tc-canvas, .tc-nav, .tc-subnav) { opacity: 0; }
+
+/* "Shorten build and test times": built from the Figma "Tests" frame. It has its own navigation
+   (slightly different from the shared one), so the shared navigation is hidden in this view. */
+.tc-shot[data-view="tests"] :is(.tc-nav, .tc-subnav) { opacity: 0; }
+/* the markup follows Figma's Tailwind export, which assumes Tailwind's reset: no borders unless
+   a side gets a width, no paragraph margins, 1.5 line height */
+.tc-layer-tests { z-index: 1; line-height: 1.5; font-size: 16px; }
+.tc-layer-tests, .tc-layer-tests * { border: 0 solid; }
+.tc-layer-tests p { margin: 0; }
+/* matched to the Figma render: Figma draws the UI font with its display-size letterforms (narrower),
+   a little less so for the step and job titles */
+.tc-layer-tests [style*="--ui-font"], .tc-layer-tests [style*="--ui-font"] * { font-variation-settings: "opsz" 28; }
+.tc-layer-tests [data-n="block_header"] p,
+.tc-layer-tests [data-n=".Job_New_ _👑"] p { font-variation-settings: "opsz" 22; }
+.tc-layer-tests [data-n="Toggle"] p { white-space: nowrap; } /* hidden "Edit" toggle: must not wrap and grow the bar */
+.tc-layer-tests [data-n="Jobs info"] { right: -0.43px !important; bottom: 0 !important; } /* 1px up/left, as in Figma */
+
 
 .term {
   position: absolute;
