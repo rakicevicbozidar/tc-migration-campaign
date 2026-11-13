@@ -132,6 +132,13 @@
     cli: "Terminal running teamcity onboard, then starting a build with the TeamCity CLI",
     tests: "TeamCity pipeline running five test jobs in parallel next to the Build job log",
   };
+  // "Shorten build and test times": parallel test jobs finish at different times; log lines stream in order
+  [[4.2, 0], [5.6, 0.4], [3.4, 0.9], [6.2, 0.2], [4.8, 1.3]].forEach(([run, delay], i) => {
+    const bar = shot.querySelectorAll('.tc-layer-tests [data-n="Load"][style*="background"]')[i];
+    if (bar) { bar.style.setProperty("--run", `${run}s`); bar.style.setProperty("--run-delay", `${delay}s`); }
+  });
+  shot.querySelectorAll('.tc-layer-tests :is([data-n="buildlog_line"], [data-n="block_header"])')
+    .forEach((row, i) => row.style.setProperty("--i", i));
   const showView = (view) => {
     if (!view || shot.dataset.view === view) return;
     shot.dataset.view = view;
@@ -281,6 +288,46 @@
     });
 
     return { sync };
+  })();
+
+  /* ---------------- Customer quotes: rotate every 7s, pause on hover / focus ---------------- */
+  (() => {
+    const carousel = document.querySelector(".quote-carousel");
+    if (!carousel) return;
+    const slides = [...carousel.querySelectorAll(".quote-slide")];
+    const dots = [...carousel.querySelectorAll(".quote-dot")];
+    const ROTATE_MS = 7000;
+    let index = 0;
+    let timer = 0;
+    let paused = false;
+    let inView = false;
+
+    const go = (next) => {
+      index = (next + slides.length) % slides.length;
+      slides.forEach((s, i) => {
+        s.classList.toggle("is-active", i === index);
+        if (i === index) s.removeAttribute("aria-hidden");
+        else s.setAttribute("aria-hidden", "true");
+      });
+      dots.forEach((d, i) => {
+        d.classList.toggle("is-active", i === index);
+        if (i === index) d.setAttribute("aria-current", "true");
+        else d.removeAttribute("aria-current");
+      });
+    };
+    const schedule = () => {
+      clearTimeout(timer);
+      if (!reduceMotion && !paused && inView) timer = setTimeout(() => { go(index + 1); schedule(); }, ROTATE_MS);
+    };
+
+    dots.forEach((d, i) => d.addEventListener("click", () => { go(i); schedule(); }));
+    carousel.addEventListener("pointerenter", () => { paused = true; schedule(); });
+    carousel.addEventListener("pointerleave", () => { paused = false; schedule(); });
+    carousel.addEventListener("focusin", () => { paused = true; schedule(); });
+    carousel.addEventListener("focusout", () => { paused = false; schedule(); });
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(([e]) => { inView = e.isIntersecting; schedule(); }).observe(carousel);
+    } else { inView = true; schedule(); }
   })();
 
   /* ---------------- Accordions ---------------- */

@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Fallbacks until JetBrains Sans files are added (see styles.css @font-face) -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=11"><!-- bump ?v= on every change so browsers drop cached copies -->
+  <link rel="stylesheet" href="styles.css?v=13"><!-- bump ?v= on every change so browsers drop cached copies -->
   <!--
     Runs before first paint, so nothing flickers.
     Intro: the loading screen plays once per browser session; reloads go straight to the page.
@@ -98,7 +98,7 @@
 
       <div class="hero-action reveal" style="--d: 820ms; --y: 40px">
         <div class="actions">
-          <a class="btn btn-lg" href="https://www.jetbrains.com/teamcity/cloud/">Start a free trial</a>
+          <a class="btn btn-lg" href="https://www.jetbrains.com/teamcity/cloud/">Start for free</a>
           <a class="btn btn-lg btn-outline" href="https://www.jetbrains.com/teamcity/contact-us/">Schedule a demo</a>
         </div>
         <p class="hero-note">Free TeamCity Cloud access. AI-assisted setup.</p>
@@ -141,13 +141,11 @@
       <div class="logo-grid">
         <ul class="logos">
           <li class="logo"><img src="assets/logos/logo-1.svg" alt="Sorbonne Université" width="103.526" height="41.6885"></li>
-          <li class="logo"><img src="assets/logos/logo-2.svg" alt="Sorbonne Université" width="99.3329" height="40"></li>
           <li class="logo">
             <span class="logo-art" style="width: 131px" role="img" aria-label="Perforce">
               <span class="logo-mask" style="inset: 19.65% 0.52% 20.55% 0.2%; --mask: url('assets/logos/perforce-mask.svg'); --ms: 130.277px 24.032px"><img src="assets/logos/perforce.svg" alt=""></span>
             </span>
           </li>
-          <li class="logo"><img src="assets/logos/logo-4.svg" alt="Sorbonne Université" width="103.526" height="40"></li>
           <li class="logo">
             <span class="logo-art" style="width: 37.5px" role="img" aria-label="HP">
               <span class="logo-mask" style="inset: 2.05% 0 2.93% 0.03%; --mask: url('assets/logos/hp-mask.svg'); --ms: 37.5px 38px; --mp: -0.01px 0.007px"><img src="assets/logos/hp.svg" alt=""></span>
@@ -159,7 +157,6 @@
             </span>
           </li>
           <li class="logo"><img src="assets/logos/amazon-game-studios.svg" alt="Amazon Games" width="54" height="40"></li>
-          <li class="logo"><img src="assets/logos/logo-8.svg" alt="Sorbonne Université" width="99.3329" height="40"></li>
           <li class="logo">
             <span class="logo-art" style="width: 88px" role="img" aria-label="Visa">
               <span class="logo-mask no-mask" style="inset: 14.5% 0.64% 15.49% 0.64%"><img src="assets/logos/visa.svg" alt=""></span>
@@ -173,11 +170,6 @@
           <li class="logo">
             <span class="logo-art" style="width: 120px" role="img" aria-label="McAfee">
               <span class="logo-mask" style="inset: 20.82% 0.3% 20.55% -0.22%; --mask: url('assets/logos/logo-11-mask.svg'); --ms: 119.895px 23.45px"><img src="assets/logos/logo-11.svg" alt=""></span>
-            </span>
-          </li>
-          <li class="logo">
-            <span class="logo-art" style="width: 119.894px; height: 23.451px" role="img" aria-label="McAfee">
-              <span class="logo-mask" style="inset: 0; --mask: url('assets/logos/logo-11-mask.svg'); --ms: 119.895px 23.45px"><img src="assets/logos/logo-12.svg" alt=""></span>
             </span>
           </li>
         </ul>
@@ -442,10 +434,35 @@
     <!-- Customer quote -->
     <section class="section quote wrap" aria-labelledby="quote-title">
       <h2 class="quote-title sr" id="quote-title">Hear from our customers</h2>
-      <figure class="sr" style="--d: 100ms">
-        <blockquote><p>“We were seeing around a 70% reduction in build times. Instead of 10 minutes, it was three or four minutes.”</p></blockquote>
-        <figcaption>– Bruce Blair, CTO at Ziax</figcaption>
-      </figure>
+      <div class="quote-carousel sr" style="--d: 100ms" aria-roledescription="carousel" aria-label="Customer quotes">
+        <div class="quote-slides" aria-live="off">
+          <figure class="quote-slide is-active" id="quote-1" role="group" aria-roledescription="slide" aria-label="1 of 6">
+            <blockquote><p>“We were seeing around a 70% reduction in build times. Instead of 10 minutes, it was three or four minutes.”</p></blockquote>
+            <figcaption>– Bruce Blair, CTO at Ziax</figcaption>
+          </figure>
+          <figure class="quote-slide" id="quote-2" role="group" aria-roledescription="slide" aria-label="2 of 6" aria-hidden="true">
+            <blockquote><p>“We use TeamCity to run our agent evaluations in parallel across isolated environments, so results are reproducible and what used to take a full day locally is actually manageable.”</p></blockquote>
+            <figcaption>– Danila Savenkov, Team Lead, JetBrains Junie</figcaption>
+          </figure>
+          <figure class="quote-slide" id="quote-3" role="group" aria-roledescription="slide" aria-label="3 of 6" aria-hidden="true">
+            <blockquote><p>“With TeamCity, we can assume things will work and won’t randomly break.”</p></blockquote>
+            <figcaption>– Wojciech Knapik, Staff DevOps Engineer, Brave</figcaption>
+          </figure>
+          <figure class="quote-slide" id="quote-4" role="group" aria-roledescription="slide" aria-label="4 of 6" aria-hidden="true">
+            <blockquote><p>“I think TeamCity has a very well-polished UI. You have confidence that it is a well-working system when you navigate it.”</p></blockquote>
+            <figcaption>– Steve Fortier, Lead Release Engineer, Gearbox</figcaption>
+          </figure>
+          <figure class="quote-slide" id="quote-5" role="group" aria-roledescription="slide" aria-label="5 of 6" aria-hidden="true">
+            <blockquote><p>“We’ve relied on TeamCity as our CI system of choice for over a decade. It provides all the features we need out of the box. We also appreciate its reliability and like Kotlin DSL for configuring our build pipelines.”</p></blockquote>
+            <figcaption>– Piotr Jagielski, VP of Engineering, Gradle Build Tool</figcaption>
+          </figure>
+          <figure class="quote-slide" id="quote-6" role="group" aria-roledescription="slide" aria-label="6 of 6" aria-hidden="true">
+            <blockquote><p>“We build IDEs and everything related to them in TeamCity, like internal services, services for statistics, etc. I’m very used to TeamCity and feel like it’s a hammer in my hand: you can do anything with it.”</p></blockquote>
+            <figcaption>– Dmitrii Panov, IntelliJ Infrastructure Technical Lead, IntelliJ IDEA</figcaption>
+          </figure>
+        </div>
+        <div class="quote-dots"><button type="button" class="quote-dot is-active" aria-controls="quote-1" aria-label="Show quote 1" aria-current="true"></button><button type="button" class="quote-dot" aria-controls="quote-2" aria-label="Show quote 2"></button><button type="button" class="quote-dot" aria-controls="quote-3" aria-label="Show quote 3"></button><button type="button" class="quote-dot" aria-controls="quote-4" aria-label="Show quote 4"></button><button type="button" class="quote-dot" aria-controls="quote-5" aria-label="Show quote 5"></button><button type="button" class="quote-dot" aria-controls="quote-6" aria-label="Show quote 6"></button></div>
+      </div>
     </section>
 
     <!-- Give your project a new place to build -->
@@ -458,7 +475,7 @@
         </div>
         <img class="start-logo sr" style="--d: 150ms" src="assets/landing/teamcity-icon.svg" alt="" width="160" height="160">
       </div>
-      <a class="btn btn-lg sr" href="https://www.jetbrains.com/teamcity/cloud/">Start a free trial</a>
+      <a class="btn btn-lg sr" href="https://www.jetbrains.com/teamcity/cloud/">Start for free</a>
     </section>
 
     <!-- FAQ -->
@@ -497,12 +514,12 @@
       <h2 class="hero-h sr">Ready to take TeamCity for a spin?</h2>
       <p class="lead sr">Try it with your project, or talk to our team about your GitHub Actions setup.</p>
       <div class="actions sr">
-        <a class="btn btn-lg" href="https://www.jetbrains.com/teamcity/cloud/">Start a free trial</a>
+        <a class="btn btn-lg" href="https://www.jetbrains.com/teamcity/cloud/">Start for free</a>
         <a class="btn btn-lg btn-outline" href="https://www.jetbrains.com/teamcity/contact-us/">Get in touch</a>
       </div>
     </section>
   </main>
 
-  <script src="main.js?v=11"></script>
+  <script src="main.js?v=13"></script>
 </body>
 </html>

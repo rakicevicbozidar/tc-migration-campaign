@@ -1170,6 +1170,28 @@ body.is-ready .tc-job-run .tc-load { animation: tc-load 7s var(--ease-io) infini
 .tc-layer-tests [data-n="Toggle"] p { white-space: nowrap; } /* hidden "Edit" toggle: must not wrap and grow the bar */
 .tc-layer-tests [data-n="Jobs info"] { right: -0.43px !important; bottom: 0 !important; } /* 1px up/left, as in Figma */
 
+/* Animation (no motion in the Figma file; same language as the pipeline picture):
+   the five test jobs run in parallel — spinner turns, progress fills at its own pace —
+   and the Build job's log streams in each time this feature is opened */
+.tc-layer-tests [data-n="Top"] img[src$="icon16-px3.svg"] { animation: spin 1.4s linear infinite; }
+.tc-layer-tests [data-n="Load"][style*="display:contents"] > div { width: auto !important; justify-content: flex-start !important; }
+.tc-shot[data-view="tests"] .tc-layer-tests [data-n="Load"][style*="background"] {
+  animation: tests-run var(--run, 4s) var(--ease-io) var(--run-delay, 0s) infinite;
+}
+@keyframes tests-run {
+  0%, 6%   { width: 19.335px; }
+  78%, 94% { width: 108.33px; border-radius: 5.687px; }
+  100%     { width: 19.335px; }
+}
+.tc-shot[data-view="tests"] .tc-layer-tests :is([data-n="buildlog_line"], [data-n="block_header"]) {
+  animation: tests-log-in 380ms var(--ease-out) both;
+  animation-delay: calc(250ms + var(--i, 0) * 70ms);
+}
+@keyframes tests-log-in {
+  from { opacity: 0; translate: 0 4px; }
+  to   { opacity: 1; translate: 0 0; }
+}
+
 
 .term {
   position: absolute;
@@ -1278,6 +1300,42 @@ body.is-ready .tc-job-run .tc-load { animation: tc-load 7s var(--ease-io) infini
   white-space: nowrap;
 }
 .quote figure { margin: 0; }
+/* quotes rotate in place: all slides share one grid cell, so the section never jumps in height */
+.quote-slides { display: grid; }
+.quote-slide {
+  grid-area: 1 / 1;
+  opacity: 0;
+  visibility: hidden;
+  translate: 0 8px;
+  transition: opacity 600ms var(--ease-out), translate 700ms var(--ease-out), visibility 0s linear 600ms;
+}
+.quote-slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  translate: 0 0;
+  transition: opacity 700ms var(--ease-out) 150ms, translate 800ms var(--ease-out) 150ms, visibility 0s;
+}
+.quote-dots { display: flex; justify-content: flex-end; gap: 4px; margin-top: 20px; }
+.quote-dot {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  position: relative;
+}
+.quote-dot::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  transition: background-color 300ms, transform 300ms var(--ease-out);
+}
+.quote-dot:hover::before { background: rgba(255, 255, 255, 0.55); }
+.quote-dot.is-active::before { background: var(--link-text); transform: scale(1.35); }
+.quote-dot:focus-visible { outline: 2px solid #b2d5ff; outline-offset: 0; border-radius: 50%; }
 .quote blockquote { margin: 0; }
 .quote blockquote p {
   color: var(--text-average);
@@ -1416,4 +1474,5 @@ body.is-ready .tc-job-run .tc-load { animation: tc-load 7s var(--ease-io) infini
   }
   html { scroll-behavior: auto; }
   .logo-track { animation: none; }
+  .tc-layer-tests [data-n="Load"][style*="background"], .tc-layer-tests [data-n="Top"] img { animation: none !important; }
 }
